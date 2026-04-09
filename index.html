@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vinyl">
+<link rel="apple-touch-icon" href="icon.png">
+<title>Vinyl / hazzp24</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Crimson+Text:wght@400;600&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --black:#0a0a0a;--surface:#111;--surface2:#1a1a1a;--surface3:#222;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#f2ede6;--muted:#777;--faint:#444;
+  --orange:#FF7300;--green:#00C900;--yellow:#FFD100;--blue:#0075FF;--purple:#9A4CFF;
+  --grad-oy:linear-gradient(135deg,#FF7300,#FFD100);
+  --grad-gy:linear-gradient(135deg,#00C900,#FFD100);
+  --grad-bp:linear-gradient(135deg,#0075FF,#9A4CFF);
+  --grad-oyp:linear-gradient(135deg,#FFD100,#FF7300,#9A4CFF);
+  --grad-gb:linear-gradient(135deg,#00C900,#0075FF);
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--black);color:var(--text);font-family:'Work Sans',sans-serif;font-weight:300;display:flex;flex-direction:column}
+
+/* Header */
+.header{padding:env(safe-area-inset-top,12px) 16px 0;flex-shrink:0}
+.header-row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2px;padding-top:6px}
+.logo{font-family:'Anton',sans-serif;font-size:30px;letter-spacing:1px;line-height:1;color:#fff}
+.handle{font-size:11px;color:var(--muted);padding-bottom:3px}
+.tagline{font-family:'Crimson Text',serif;font-size:13px;color:var(--muted);margin-bottom:10px}
+
+/* Stats */
+.value-hero{margin:0 16px 10px;background:var(--surface);border:0.5px solid var(--border);border-radius:14px;padding:14px;flex-shrink:0}
+.vh-label{font-family:'Crimson Text',serif;font-size:12px;color:var(--muted);margin-bottom:3px}
+.vh-num{font-family:'Anton',sans-serif;font-size:38px;letter-spacing:-1px;color:#fff;line-height:1;margin-bottom:10px}
+.vs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.vs{background:var(--surface2);border-radius:8px;padding:9px;border:0.5px solid var(--border)}
+.vs-label{font-family:'Crimson Text',serif;font-size:11px;color:var(--muted);margin-bottom:2px}
+.vs-num{font-family:'Anton',sans-serif;font-size:17px;color:#fff}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;padding:0 16px 8px;flex-shrink:0}
+.tab{flex:1;padding:9px 8px;border-radius:10px;border:0.5px solid var(--border);background:transparent;color:var(--muted);font-family:'Work Sans',sans-serif;font-weight:500;font-size:13px;cursor:pointer;transition:all .15s;text-align:center}
+.tab.ac{background:var(--surface2);border-color:var(--orange);color:var(--orange)}
+.tab.aw{background:var(--surface2);border-color:var(--blue);color:var(--blue)}
+.tab:hover:not(.ac):not(.aw){border-color:var(--border2);color:var(--text)}
+
+/* Search */
+.search-row{padding:0 16px 6px;display:flex;gap:8px;align-items:center;flex-shrink:0}
+.sw{position:relative;flex:1}
+.si{width:100%;background:var(--surface);border:0.5px solid var(--border);border-radius:10px;padding:9px 12px 9px 34px;color:var(--text);font-family:'Work Sans',sans-serif;font-size:13px;font-weight:300;outline:none;transition:border-color .15s;-webkit-appearance:none}
+.si::placeholder{color:var(--muted)}.si:focus{border-color:var(--border2)}
+.si-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.cpill{font-size:11px;font-weight:500;color:var(--muted);white-space:nowrap;background:var(--surface2);border:0.5px solid var(--border);border-radius:20px;padding:4px 10px}
+
+/* Chips */
+.chips{display:flex;gap:5px;padding:0 16px 6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-shrink:0}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:4px 10px;border-radius:20px;border:0.5px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-family:'Work Sans',sans-serif;font-weight:400;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.chip:hover:not(.chip-a){border-color:var(--border2);color:var(--text)}
+.chip-all.chip-a{border-color:var(--faint);color:var(--text);background:var(--surface2)}
+.chip-sh.chip-a{border-color:var(--green);color:var(--green);background:rgba(0,201,0,.08)}
+.chip-store.chip-a{border-color:var(--purple);color:var(--purple);background:rgba(154,76,255,.08)}
+.chip-hmv.chip-a{border-color:var(--yellow);color:var(--yellow);background:rgba(255,209,0,.08)}
+.chip-patience.chip-a{border-color:var(--orange);color:var(--orange);background:rgba(255,115,0,.08)}
+.chip-sp.chip-a{border-color:#1DB954;color:#1DB954;background:rgba(29,185,84,.08)}
+
+/* Sort */
+.sort-strip{display:flex;gap:5px;padding:0 16px 6px;align-items:center;flex-shrink:0;flex-wrap:wrap}
+.sort-label{font-size:11px;color:var(--muted)}
+.sb{padding:3px 9px;border-radius:6px;border:0.5px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-family:'Work Sans',sans-serif;cursor:pointer;transition:all .15s}
+.sb.sa{background:var(--surface2);border-color:var(--border2);color:var(--text)}
+
+/* Scroll */
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 16px;padding-bottom:env(safe-area-inset-bottom,16px)}
+.scroll-area::-webkit-scrollbar{width:2px}
+.scroll-area::-webkit-scrollbar-thumb{background:var(--faint);border-radius:2px}
+
+/* Records */
+.record{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:7px;position:relative;overflow:hidden;display:flex;gap:10px;align-items:center}
+.record::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2.5px;border-radius:2px 0 0 2px}
+.d70::before{background:var(--grad-oy)}.d80::before{background:var(--grad-gy)}.d90::before{background:var(--grad-gb)}.d00::before{background:var(--grad-bp)}.d10::before{background:var(--grad-bp)}.d20::before{background:var(--grad-oyp)}
+
+/* Artwork */
+.art{width:52px;height:52px;border-radius:6px;object-fit:cover;background:var(--surface2);flex-shrink:0;display:block}
+.art-placeholder{width:52px;height:52px;border-radius:6px;background:var(--surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center;border:0.5px solid var(--border)}
+.art-placeholder svg{opacity:0.25}
+
+.record-info{flex:1;min-width:0}
+.r-artist{font-family:'Crimson Text',serif;font-size:13px;color:#fff;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r-title{font-family:'Work Sans',sans-serif;font-weight:400;font-size:14px;color:#fff;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r-meta{display:flex;align-items:center;gap:5px;margin-top:5px;flex-wrap:wrap}
+.r-year{font-size:11px;color:#fff;opacity:0.55}
+.r-price{font-size:12px;font-weight:500}
+.r-price.orange{color:var(--orange)}.r-price.blue{color:var(--blue)}
+.r-genre{font-size:10px;color:#fff;opacity:0.45;font-style:italic}
+
+/* Badges */
+.badge{display:inline-block;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:500;font-family:'Work Sans',sans-serif}
+.b-sh{background:rgba(0,201,0,.1);color:var(--green)}
+.b-store{background:rgba(154,76,255,.1);color:var(--purple)}
+.b-hmv{background:rgba(255,209,0,.1);color:var(--yellow)}
+.b-patience{background:rgba(255,115,0,.1);color:var(--orange)}
+.b-sp{background:rgba(29,185,84,.1);color:#1DB954}
+.b-hmvdeal{background:rgba(255,209,0,.18);color:var(--yellow);border:0.5px solid rgba(255,209,0,.3)}
+
+.list{display:none}.list.visible{display:block}
+.empty{padding:48px 16px;text-align:center;color:var(--muted);font-family:'Crimson Text',serif;font-size:16px;display:none}
+.empty.visible{display:block}
+
+.legend{padding:8px 16px 12px;display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0}
+.li{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)}
+.ld{width:8px;height:8px;border-radius:2px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-row">
+    <div class="logo">VINYL</div>
+    <div class="handle">hazzp24</div>
+  </div>
+  <div class="tagline">Collection &amp; wishlist · updated Apr 2026</div>
+</div>
+
+<div class="value-hero">
+  <div class="vh-label">Collection value</div>
+  <div class="vh-num" id="hero-val">£—</div>
+  <div class="vs-grid">
+    <div class="vs"><div class="vs-label">Records</div><div class="vs-num" id="s-count">—</div></div>
+    <div class="vs"><div class="vs-label">Avg value</div><div class="vs-num" id="s-avg">—</div></div>
+    <div class="vs"><div class="vs-label">Wishlist</div><div class="vs-num" id="s-wish">—</div></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab ac" id="tab-c" onclick="switchTab('c')">Collection</button>
+  <button class="tab" id="tab-w" onclick="switchTab('w')">Wishlist</button>
+</div>
+
+<div class="search-row">
+  <div class="sw">
+    <svg class="si-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input class="si" id="search" type="search" placeholder="Search artist, title or genre…" oninput="filter()">
+  </div>
+  <div class="cpill" id="cpill">0</div>
+</div>
+
+<!-- Collection: genre filter then sort -->
+<div class="chips" id="cgenre-chips">
+  <button class="chip chip-all chip-a" data-g="" onclick="setCGenre(this)">All genres</button>
+  <button class="chip" data-g="Motown" onclick="setCGenre(this)">Motown</button>
+  <button class="chip" data-g="Soul / Funk" onclick="setCGenre(this)">Soul / Funk</button>
+  <button class="chip" data-g="Hip-Hop" onclick="setCGenre(this)">Hip-Hop</button>
+  <button class="chip" data-g="Neo-Soul / Leftfield" onclick="setCGenre(this)">Neo-Soul</button>
+  <button class="chip" data-g="R&B / Pop" onclick="setCGenre(this)">R&B / Pop</button>
+  <button class="chip" data-g="Electronic" onclick="setCGenre(this)">Electronic</button>
+  <button class="chip" data-g="Rock / New Wave" onclick="setCGenre(this)">Rock</button>
+  <button class="chip" data-g="Reggae" onclick="setCGenre(this)">Reggae</button>
+  <button class="chip" data-g="Jazz" onclick="setCGenre(this)">Jazz</button>
+  <button class="chip" data-g="Disco / Pop" onclick="setCGenre(this)">Disco</button>
+</div>
+<div class="sort-strip" id="csort">
+  <span class="sort-label">Sort</span>
+  <button class="sb sa" id="sb-az" onclick="setSort('az')">A–Z</button>
+  <button class="sb" id="sb-yr" onclick="setSort('yr')">Year</button>
+  <button class="sb" id="sb-val" onclick="setSort('val')">Value</button>
+</div>
+
+<!-- Wishlist: tier filter, then genre filter, then sort -->
+<div class="chips" id="wchips" style="display:none">
+  <button class="chip chip-all chip-a" data-t="" onclick="setTier(this)">All</button>
+  <button class="chip chip-sh" data-t="sh" onclick="setTier(this)">S/H</button>
+  <button class="chip chip-store" data-t="store" onclick="setTier(this)">Store</button>
+  <button class="chip chip-hmv" data-t="hmvdeal" onclick="setTier(this)">HMV 3-for</button>
+  <button class="chip chip-patience" data-t="patience" onclick="setTier(this)">Patience</button>
+  <button class="chip chip-sp" data-t="sp" onclick="setTier(this)">Spotify</button>
+</div>
+<div class="chips" id="wgenre-chips" style="display:none">
+  <button class="chip chip-all chip-a" data-g="" onclick="setWGenre(this)">All genres</button>
+  <button class="chip" data-g="Motown" onclick="setWGenre(this)">Motown</button>
+  <button class="chip" data-g="Soul / Funk" onclick="setWGenre(this)">Soul / Funk</button>
+  <button class="chip" data-g="Hip-Hop" onclick="setWGenre(this)">Hip-Hop</button>
+  <button class="chip" data-g="Neo-Soul / Leftfield" onclick="setWGenre(this)">Neo-Soul</button>
+  <button class="chip" data-g="Electronic" onclick="setWGenre(this)">Electronic</button>
+  <button class="chip" data-g="Rock / New Wave" onclick="setWGenre(this)">Rock</button>
+  <button class="chip" data-g="Jazz" onclick="setWGenre(this)">Jazz</button>
+</div>
+<div class="sort-strip" id="wsort" style="display:none">
+  <span class="sort-label">Sort</span>
+  <button class="sb sa" id="sb-waz" onclick="setWSort('az')">A–Z</button>
+  <button class="sb" id="sb-wyr" onclick="setWSort('yr')">Year</button>
+  <button class="sb" id="sb-wprice" onclick="setWSort('price')">Price</button>
+</div>
+
+<div class="scroll-area" id="scroll-area">
+  <div class="list visible" id="list-c"></div>
+  <div class="list" id="list-w"></div>
+  <div class="empty" id="empty">Nothing found</div>
+  <div class="legend" id="dlegend">
+    <div class="li"><div class="ld" style="background:linear-gradient(135deg,#FF7300,#FFD100)"></div><span>70s</span></div>
+    <div class="li"><div class="ld" style="background:linear-gradient(135deg,#00C900,#FFD100)"></div><span>80s</span></div>
+    <div class="li"><div class="ld" style="background:linear-gradient(135deg,#00C900,#0075FF)"></div><span>90s/00s</span></div>
+    <div class="li"><div class="ld" style="background:linear-gradient(135deg,#0075FF,#9A4CFF)"></div><span>10s</span></div>
+    <div class="li"><div class="ld" style="background:linear-gradient(135deg,#FFD100,#FF7300,#9A4CFF)"></div><span>20s</span></div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+// ── Artwork cache ──────────────────────────────────────────────
+const artCache = {};
+
+async function fetchArt(artist, title, mbid) {
+  const key = artist + '|' + title;
+  if (artCache[key] !== undefined) return artCache[key];
+  artCache[key] = null; // mark as fetching
+
+  try {
+    // 1. If we have a known MBID, go straight to Cover Art Archive
+    if (mbid) {
+      const r = await fetch(`https://coverartarchive.org/release/${mbid}`, {signal: AbortSignal.timeout(4000)});
+      if (r.ok) {
+        const d = await r.json();
+        const img = d.images?.find(i => i.front) || d.images?.[0];
+        if (img?.thumbnails?.small || img?.image) {
+          artCache[key] = img.thumbnails?.small || img.image;
+          return artCache[key];
+        }
+      }
+    }
+
+    // 2. Search MusicBrainz for the release
+    const q = encodeURIComponent(`release:"${title}" AND artist:"${artist}"`);
+    const mb = await fetch(`https://musicbrainz.org/ws/2/release?query=${q}&limit=3&fmt=json`, {
+      headers: {'User-Agent': 'VinylDashboard/1.0 (personal use)'},
+      signal: AbortSignal.timeout(5000)
+    });
+    if (!mb.ok) { artCache[key] = null; return null; }
+    const mbData = await mb.json();
+    const releases = mbData?.releases;
+    if (!releases?.length) { artCache[key] = null; return null; }
+
+    // Try each release until we find artwork
+    for (const rel of releases.slice(0, 3)) {
+      try {
+        const ca = await fetch(`https://coverartarchive.org/release/${rel.id}`, {signal: AbortSignal.timeout(4000)});
+        if (ca.ok) {
+          const cad = await ca.json();
+          const img = cad.images?.find(i => i.front) || cad.images?.[0];
+          if (img?.thumbnails?.small || img?.image) {
+            artCache[key] = img.thumbnails?.small || img.image;
+            return artCache[key];
+          }
+        }
+      } catch {}
+    }
+  } catch {}
+
+  artCache[key] = null;
+  return null;
+}
+
+function artEl(url) {
+  if (!url) return `<div class="art-placeholder"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></div>`;
+  return `<img class="art" src="${url}" loading="lazy" onerror="this.outerHTML='<div class=\\'art-placeholder\\'><svg width=\\"22\\" height=\\"22\\" viewBox=\\"0 0 24 24\\" fill=\\"none\\" stroke=\\"white\\" stroke-width=\\"1.5\\"><circle cx=\\"12\\" cy=\\"12\\" r=\\"10\\"/><circle cx=\\"12\\" cy=\\"12\\" r=\\"3\\"/></svg></div>'">`;
+}
+
+async function loadArtForVisible() {
+  const visible = document.querySelectorAll('.record[data-artist]:not([data-art-loaded])');
+  const toLoad = [...visible].slice(0, 15); // batch 15 at a time
+  await Promise.allSettled(toLoad.map(async el => {
+    el.dataset.artLoaded = '1';
+    const url = await fetchArt(el.dataset.artist, el.dataset.title, el.dataset.mbid || '');
+    const placeholder = el.querySelector('.art-placeholder');
+    const img = el.querySelector('.art');
+    if (url && placeholder) {
+      const newImg = document.createElement('img');
+      newImg.className = 'art';
+      newImg.src = url;
+      newImg.loading = 'lazy';
+      newImg.onerror = function(){ this.outerHTML = placeholder.outerHTML; };
+      placeholder.replaceWith(newImg);
+    }
+  }));
+}
+
+// ── Helpers ────────────────────────────────────────────────────
+function dc(y){const yr=parseInt(y)||0;if(yr>=2020)return'd20';if(yr>=2010)return'd10';if(yr>=2000)return'd00';if(yr>=1990)return'd90';if(yr>=1980)return'd80';return'd70'}
+
+function hmvBadge(note){
+  return note==='deal' ? `<span class="badge b-hmvdeal">HMV 3-for ✓</span>` : '';
+}
+function tierBadge(t, hmvNote){
+  if(t==='hmv' && hmvNote==='deal') return '';
+  const m={sh:['S/H','b-sh'],store:['Store','b-store'],hmv:['HMV 3-for','b-hmv'],patience:['Patience','b-patience']};
+  const[l,c]=m[t]||['',''];return l?`<span class="badge ${c}">${l}</span>`:'';
+}
+
+// ── Build lists ────────────────────────────────────────────────
+function buildC(){
+  const el=document.getElementById('list-c');el.innerHTML='';
+  COLL.forEach(([a,t,y,v,g,mbid])=>{
+    const d=document.createElement('div');
+    d.className='record '+dc(y);
+    d.dataset.search=(a+' '+t+' '+g).toLowerCase();
+    d.dataset.year=y;d.dataset.val=v;d.dataset.genre=g;
+    d.dataset.az=a.replace(/^The /,'').toLowerCase();
+    d.dataset.artist=a;d.dataset.title=t;
+    if(mbid)d.dataset.mbid=mbid;
+    d.innerHTML=`<div class="art-placeholder"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></div>
+<div class="record-info">
+  <div class="r-artist">${a}</div>
+  <div class="r-title">${t}</div>
+  <div class="r-meta"><span class="r-year">${y}</span><span class="r-price orange">~£${v}</span><span class="r-genre">${g}</span></div>
+</div>`;
+    el.appendChild(d);
+  });
+  const tot=COLL.reduce((s,r)=>s+r[3],0);
+  document.getElementById('hero-val').textContent='£'+tot.toLocaleString();
+  document.getElementById('s-count').textContent=COLL.length;
+  document.getElementById('s-avg').textContent='£'+Math.round(tot/COLL.length);
+  document.getElementById('s-wish').textContent='£'+WISH.reduce((s,r)=>s+r[3],0).toLocaleString();
+}
+
+function buildW(){
+  const el=document.getElementById('list-w');el.innerHTML='';
+  WISH.forEach(([a,t,y,p,tier,sp,g,hmvNote,mbid])=>{
+    const d=document.createElement('div');
+    d.className='record '+dc(y);
+    d.dataset.search=(a+' '+t+' '+g).toLowerCase();
+    d.dataset.tier=tier;d.dataset.sp=sp?'1':'';
+    d.dataset.hmv=hmvNote==='deal'?'1':'';
+    d.dataset.year=y;d.dataset.val=p;d.dataset.genre=g;
+    d.dataset.az=a.replace(/^The /,'').toLowerCase();
+    d.dataset.artist=a;d.dataset.title=t;
+    if(mbid)d.dataset.mbid=mbid;
+    d.innerHTML=`<div class="art-placeholder"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></div>
+<div class="record-info">
+  <div class="r-artist">${a}</div>
+  <div class="r-title">${t}</div>
+  <div class="r-meta"><span class="r-year">${y}</span><span class="r-price blue">~£${p}</span><span class="r-genre">${g}</span>${tierBadge(tier,hmvNote)}${sp?'<span class="badge b-sp">Spotify</span>':''}${hmvBadge(hmvNote)}</div>
+</div>`;
+    el.appendChild(d);
+  });
+}
+
+// ── Sort ───────────────────────────────────────────────────────
+function sortList(id,key){
+  const el=document.getElementById(id);
+  const items=[...el.querySelectorAll('.record')];
+  items.sort((a,b)=>{
+    if(key==='az')return a.dataset.az.localeCompare(b.dataset.az);
+    if(key==='yr')return parseInt(a.dataset.year)-parseInt(b.dataset.year);
+    if(key==='val'||key==='price')return parseInt(b.dataset.val)-parseInt(a.dataset.val);
+    return 0;
+  });
+  items.forEach(i=>el.appendChild(i));
+}
+
+let AT='c',TIER='',CSORT='az',WSORT='az',CGENRE='',WGENRE='';
+
+function setSort(s){
+  CSORT=s;
+  ['az','yr','val'].forEach(k=>document.getElementById('sb-'+k).classList.toggle('sa',k===s));
+  sortList('list-c',s);filter();
+}
+function setWSort(s){
+  WSORT=s;
+  ['az','yr','price'].forEach(k=>document.getElementById('sb-w'+k).classList.toggle('sa',k===s));
+  sortList('list-w',s);filter();
+}
+function setCGenre(el){
+  CGENRE=el.dataset.g;
+  document.querySelectorAll('#cgenre-chips .chip').forEach(c=>c.classList.remove('chip-a'));
+  el.classList.add('chip-a');filter();
+}
+function setWGenre(el){
+  WGENRE=el.dataset.g;
+  document.querySelectorAll('#wgenre-chips .chip').forEach(c=>c.classList.remove('chip-a'));
+  el.classList.add('chip-a');filter();
+}
+function switchTab(tab){
+  AT=tab;TIER='';CGENRE='';WGENRE='';
+  document.getElementById('search').value='';
+  document.getElementById('tab-c').className='tab'+(tab==='c'?' ac':'');
+  document.getElementById('tab-w').className='tab'+(tab==='w'?' aw':'');
+  document.getElementById('list-c').classList.toggle('visible',tab==='c');
+  document.getElementById('list-w').classList.toggle('visible',tab==='w');
+  document.getElementById('cgenre-chips').style.display=tab==='c'?'flex':'none';
+  document.getElementById('csort').style.display=tab==='c'?'flex':'none';
+  document.getElementById('wchips').style.display=tab==='w'?'flex':'none';
+  document.getElementById('wgenre-chips').style.display=tab==='w'?'flex':'none';
+  document.getElementById('wsort').style.display=tab==='w'?'flex':'none';
+  document.getElementById('dlegend').style.display=tab==='c'?'block':'none';
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('chip-a',c.dataset.t===''||c.dataset.g===''));
+  filter();
+  setTimeout(loadArtForVisible, 100);
+}
+function setTier(el){
+  TIER=el.dataset.t;
+  document.querySelectorAll('#wchips .chip').forEach(c=>c.classList.remove('chip-a'));
+  el.classList.add('chip-a');filter();
+}
+function filter(){
+  const q=document.getElementById('search').value.toLowerCase().trim();
+  const lid=AT==='c'?'list-c':'list-w';
+  const genre=AT==='c'?CGENRE:WGENRE;
+  const recs=document.querySelectorAll('#'+lid+' .record');
+  let n=0;
+  recs.forEach(r=>{
+    const mq=!q||r.dataset.search.includes(q);
+    let mt=true;
+    if(TIER==='sp') mt=r.dataset.sp==='1';
+    else if(TIER==='hmvdeal') mt=r.dataset.hmv==='1';
+    else if(TIER) mt=r.dataset.tier===TIER;
+    const mg=!genre||r.dataset.genre===genre;
+    const show=mq&&mt&&mg;
+    r.style.display=show?'':'none';
+    if(show)n++;
+  });
+  document.getElementById('cpill').textContent=n;
+  document.getElementById('empty').classList.toggle('visible',n===0);
+  setTimeout(loadArtForVisible, 200);
+}
+
+// ── Init ───────────────────────────────────────────────────────
+buildC();buildW();
+sortList('list-c','az');sortList('list-w','az');
+filter();
+// Load art for initial view after a short delay
+setTimeout(loadArtForVisible, 500);
+
+// Load more art on scroll
+document.getElementById('scroll-area').addEventListener('scroll', ()=>{
+  clearTimeout(window._scrollTimer);
+  window._scrollTimer = setTimeout(loadArtForVisible, 300);
+});
+</script>
+</body>
+</html>
