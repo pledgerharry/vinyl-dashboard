@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vinyl">
+<link rel="apple-touch-icon" href="icon.png">
+<title>Vinyl / hazzp24</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Crimson+Text:wght@400;600&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --black:#0a0a0a;--surface:#111;--surface2:#1a1a1a;--surface3:#222;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#f2ede6;--muted:#777;--faint:#444;
+  --orange:#FF7300;--green:#00C900;--yellow:#FFD100;--blue:#0075FF;--purple:#9A4CFF;
+  --grad-oy:linear-gradient(135deg,#FF7300,#FFD100);
+  --grad-gy:linear-gradient(135deg,#00C900,#FFD100);
+  --grad-bp:linear-gradient(135deg,#0075FF,#9A4CFF);
+  --grad-oyp:linear-gradient(135deg,#FFD100,#FF7300,#9A4CFF);
+  --grad-gb:linear-gradient(135deg,#00C900,#0075FF);
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--black);color:var(--text);font-family:'Work Sans',sans-serif;font-weight:300;display:flex;flex-direction:column}
+
+/* Header */
+.header{padding:env(safe-area-inset-top,12px) 16px 0;flex-shrink:0}
+.header-row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2px;padding-top:6px}
+.logo{font-family:'Anton',sans-serif;font-size:30px;letter-spacing:1px;line-height:1;color:#fff}
+.handle{font-size:11px;color:var(--muted);padding-bottom:3px}
+.tagline{font-family:'Crimson Text',serif;font-size:13px;color:var(--muted);margin-bottom:10px}
+
+/* Stats */
+.value-hero{margin:0 16px 10px;background:var(--surface);border:0.5px solid var(--border);border-radius:14px;padding:14px;flex-shrink:0}
+.vh-label{font-family:'Crimson Text',serif;font-size:12px;color:var(--muted);margin-bottom:3px}
+.vh-num{font-family:'Anton',sans-serif;font-size:38px;letter-spacing:-1px;color:#fff;line-height:1;margin-bottom:10px}
+.vs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.vs{background:var(--surface2);border-radius:8px;padding:9px;border:0.5px solid var(--border)}
+.vs-label{font-family:'Crimson Text',serif;font-size:11px;color:var(--muted);margin-bottom:2px}
+.vs-num{font-family:'Anton',sans-serif;font-size:17px;color:#fff}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;padding:0 16px 8px;flex-shrink:0}
+.tab{flex:1;padding:9px 8px;border-radius:10px;border:0.5px solid var(--border);background:transparent;color:var(--muted);font-family:'Work Sans',sans-serif;font-weight:500;font-size:13px;cursor:pointer;transition:all .15s;text-align:center}
+.tab.ac{background:var(--surface2);border-color:var(--orange);color:var(--orange)}
+.tab.aw{background:var(--surface2);border-color:var(--blue);color:var(--blue)}
+.tab:hover:not(.ac):not(.aw){border-color:var(--border2);color:var(--text)}
+
+/* Search */
+.search-row{padding:0 16px 6px;display:flex;gap:8px;align-items:center;flex-shrink:0}
+.sw{position:relative;flex:1}
+.si{width:100%;background:var(--surface);border:0.5px solid var(--border);border-radius:10px;padding:9px 12px 9px 34px;color:var(--text);font-family:'Work Sans',sans-serif;font-size:13px;font-weight:300;outline:none;transition:border-color .15s;-webkit-appearance:none}
+.si::placeholder{color:var(--muted)}.si:focus{border-color:var(--border2)}
+.si-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.cpill{font-size:11px;font-weight:500;color:var(--muted);white-space:nowrap;background:var(--surface2);border:0.5px solid var(--border);border-radius:20px;padding:4px 10px}
+
+/* Chips */
+.chips{display:flex;gap:5px;padding:0 16px 6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-shrink:0}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:4px 10px;border-radius:20px;border:0.5px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-family:'Work Sans',sans-serif;font-weight:400;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.chip:hover:not(.chip-a){border-color:var(--border2);color:var(--text)}
+.chip-all.chip-a{border-color:var(--faint);color:var(--text);background:var(--surface2)}
+.chip-sh.chip-a{border-color:var(--green);color:var(--green);background:rgba(0,201,0,.08)}
+.chip-store.chip-a{border-color:var(--purple);color:var(--purple);background:rgba(154,76,255,.08)}
+.chip-hmv.chip-a{border-color:var(--yellow);color:var(--yellow);background:rgba(255,209,0,.08)}
+.chip-patience.chip-a{border-color:var(--orange);color:var(--orange);background:rgba(255,115,0,.08)}
+.chip-sp.chip-a{border-color:#1DB954;color:#1DB954;background:rgba(29,185,84,.08)}
+
+/* Sort */
+.sort-strip{display:flex;gap:5px;padding:0 16px 6px;align-items:center;flex-shrink:0;flex-wrap:wrap}
+.sort-label{font-size:11px;color:var(--muted)}
+.sb{padding:3px 9px;border-radius:6px;border:0.5px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-family:'Work Sans',sans-serif;cursor:pointer;transition:all .15s}
+.sb.sa{background:var(--surface2);border-color:var(--border2);color:var(--text)}
+
+/* Scroll */
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 16px;padding-bottom:env(safe-area-inset-bottom,16px)}
+.scroll-area::-webkit-scrollbar{width:2px}
+.scroll-area::-webkit-scrollbar-thumb{background:var(--faint);border-radius:2px}
+
+/* Records */
+.record{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:7px;position:relative;overflow:hidden;display:flex;gap:10px;align-items:center}
+.record::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2.5px;border-radius:2px 0 0 2px}
+.d70::before{background:var(--grad-oy)}.d80::before{background:var(--grad-gy)}.d90::before{background:var(--grad-gb)}.d00::before{background:var(--grad-bp)}.d10::before{background:var(--grad-bp)}.d20::before{background:var(--grad-oyp)}
+
+/* Artwork */
+.art{width:52px;height:52px;border-radius:6px;object-fit:cover;background:var(--surface2);flex-shrink:0;display:block}
+.art-placeholder{width:52px;height:52px;border-radius:6px;background:var(--surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center;border:0.5px solid var(--border)}
+.art-placeholder svg{opacity:0.25}
+
+.record-info{flex:1;min-width:0}
+.r-artist{font-family:'Crimson Text',serif;font-size:13px;color:#fff;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r-title{font-family:'Work Sans',sans-serif;font-weight:400;font-size:14px;color:#fff;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r-meta{display:flex;align-items:center;gap:5px;margin-top:5px;flex-wrap:wrap}
+.r-year{font-size:11px;color:#fff;opacity:0.55}
+.r-price{font-size:12px;font-weight:500}
+.r-price.orange{color:var(--orange)}.r-price.blue{color:var(--blue)}
+.r-genre{font-size:10px;color:#fff;opacity:0.45;font-style:italic}
+
+/* Badges */
+.badge{display:inline-block;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:500;font-family:'Work Sans',sans-serif}
+.b-sh{background:rgba(0,201,0,.1);color:var(--green)}
+.b-store{background:rgba(154,76,255,.1);color:var(--purple)}
+.b-hmv{background:rgba(255,209,0,.1);color:var(--yellow)}
+.b-patience{background:rgba(255,115,0,.1);color:var(--orange)}
+.b-sp{background:rgba(29,185,84,.1);color:#1DB954}
+.b-hmvdeal{background:rgba(255,209,0,.18);color:var(--yellow);border:0.5px solid rgba(255,209,0,.3)}
+
+/* Purchased button */
+.btn-purchased{margin-top:8px;padding:5px 10px;border-radius:7px;border:0.5px solid rgba(0,201,0,.3);background:rgba(0,201,0,.08);color:var(--green);font-size:11px;font-family:'Work Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.btn-purchased:hover{background:rgba(0,201,0,.15);border-color:var(--green)}
+.btn-purchased svg{flex-shrink:0}
+
+/* Add button in header */
+.btn-add{padding:6px 12px;border-radius:8px;border:0.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:12px;font-family:'Work Sans',sans-serif;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .15s}
+.btn-add:hover{border-color:var(--orange);color:var(--orange)}
+
+/* Toast undo */
+.toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:0.5px solid var(--border2);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);z-index:999;transition:transform .25s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,.5)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast-undo{background:none;border:none;color:var(--orange);font-size:13px;font-weight:500;font-family:'Work Sans',sans-serif;cursor:pointer;padding:0}
+
+/* Sheet overlay */
+.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;opacity:0;pointer-events:none;transition:opacity .2s}
+.sheet-overlay.open{opacity:1;pointer-events:all}
+.sheet{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-radius:18px 18px 0 0;padding:20px 16px calc(env(safe-area-inset-bottom,0px) + 24px);z-index:101;transform:translateY(100%);transition:transform .3s cubic-bezier(.34,1.1,.64,1);max-height:85vh;overflow-y:auto}
+.sheet.open{transform:translateY(0)}
+.sheet-handle{width:36px;height:4px;background:var(--faint);border-radius:2px;margin:0 auto 18px}
+.sheet-title{font-family:'Anton',sans-serif;font-size:22px;color:#fff;margin-bottom:4px}
+.sheet-sub{font-family:'Crimson Text',serif;font-size:13px;color:var(--muted);margin-bottom:16px}
+
+/* Sheet form */
+.sheet-input{width:100%;background:var(--surface2);border:0.5px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'Work Sans',sans-serif;font-size:14px;font-weight:300;outline:none;margin-bottom:8px;-webkit-appearance:none}
+.sheet-input:focus{border-color:var(--border2)}
+.sheet-input::placeholder{color:var(--muted)}
+.btn-search{width:100%;padding:12px;border-radius:10px;border:none;background:var(--orange);color:#000;font-family:'Work Sans',sans-serif;font-weight:500;font-size:14px;cursor:pointer;margin-bottom:16px;transition:opacity .15s}
+.btn-search:hover{opacity:0.88}
+.btn-search:disabled{opacity:0.4;cursor:not-allowed}
+
+/* Search results in sheet */
+.s-result{background:var(--surface2);border:0.5px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:7px;display:flex;gap:10px;align-items:center;cursor:pointer;transition:border-color .15s}
+.s-result:hover{border-color:var(--border2)}
+.s-result.selected{border-color:var(--orange)}
+.s-art{width:44px;height:44px;border-radius:6px;object-fit:cover;background:var(--surface3);flex-shrink:0}
+.s-info{flex:1;min-width:0}
+.s-title{font-size:13px;font-weight:400;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.s-notfound{text-align:center;padding:24px 0;font-family:'Crimson Text',serif;color:var(--muted);font-size:15px}
+
+/* Manual confirm row */
+.confirm-row{display:flex;gap:8px;margin-top:4px}
+.btn-confirm{flex:1;padding:12px;border-radius:10px;border:none;background:var(--green);color:#000;font-family:'Work Sans',sans-serif;font-weight:500;font-size:14px;cursor:pointer;transition:opacity .15s}
+.btn-confirm:hover{opacity:0.88}
+.btn-cancel-sheet{flex:0 0 auto;padding:12px 16px;border-radius:10px;border:0.5px solid var(--border);background:transparent;color:var(--muted);font-family:'Work Sans',sans-serif;font-size:14px;cursor:pointer}
+
+/* Genre picker in sheet */
+.genre-pick{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.genre-pick button{padding:4px 10px;border-radius:20px;border:0.5px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-family:'Work Sans',sans-serif;cursor:pointer;transition:all .15s}
+.genre-pick button.sel{border-color:var(--orange);color:var(--orange);background:rgba(255,115,0,.08)}
+
+.list{display:none}.list.visible{display:block}
+.empty{padding:48px 16px;text-align:center;color:var(--muted);font-family:'Crimson Text',serif;font-size:16px;display:none}
+.empty.visible{display:block}
+
+.legend{padding:8px 16px 12px;display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0}
+.li{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)}
+.ld{width:8px;height:8px;border-radius:2px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-row">
+    <div class="logo">VINYL</div>
+    <button class="btn-add" onclick="openSheet()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add record
+    </button>
+  </div>
+  <div class="tagline">Collection &amp; wishlist · updated Apr 2026</div>
+</div>
+
+<!-- Toast undo -->
+<div class="toast" id="toast">
+  <span id="toast-msg"></span>
+  <button class="toast-undo" id="toast-undo" onclick="undoPurchased()">Undo</button>
+</div>
+
+<!-- Add record sheet -->
+<div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">Add record</div>
+  <div class="sheet-sub">Search Discogs to pull the image and price</div>
+  <input class="sheet-input" id="add-artist" placeholder="Artist" autocomplete="off">
+  <input class="sheet-input" id="add-title" placeholder="Album title" autocomplete="off" onkeydown="if(event.key==='Enter')searchDiscogs()">
+  <button class="btn-search" id="btn-search" onclick="searchDiscogs()">Search</button>
+  <div id="sheet-results"></div>
+  <div id="sheet-confirm" style="display:none">
+    <div class="sheet-sub" style="margin-bottom:8px">Select a genre</div>
+    <div class="genre-pick" id="genre-pick"></div>
+    <div class="confirm-row">
+      <button class="btn-confirm" onclick="confirmAdd()">Add to collection</button>
+      <button class="btn-cancel-sheet" onclick="clearConfirm()">Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="value-hero">
+  <div class="vh-label">Collection value</div>
+  <div class="vh-num" id="hero-val">£—</div>
+  <div class="vs-grid">
+    <div class="vs"><div class="vs-label">Records</div><div class="vs-num" id="s-count">—</div></div>
+    <div class="vs"><div class="vs-label">Avg value</div><div class="vs-num" id="s-avg">—</div></div>
+    <div class="vs"><div class="vs-label">Wishlist</div><div class="vs-num" id="s-wish">—</div></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab ac" id="tab-c" onclick="switchTab('c')">Collection</button>
+  <button class="tab" id="tab-w" onclick="switchTab('w')">Wishlist</button>
+</div>
+
+<div class="search-row">
+  <div class="sw">
+    <svg class="si-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input class="si" id="search" type="search" placeholder="Search artist, title or genre…" oninput="filter()">
+  </div>
+  <div class="cpill" id="cpill">0</div>
+</div>
+
+<!-- Collection: genre filter then sort -->
+<div class="chips" id="cgenre-chips">
+  <button class="chip chip-all chip-a" data-g="" onclick="setCGenre(this)">All genres</button>
+  <button class="chip" data-g="Motown" onclick="setCGenre(this)">Motown</button>
+  <button class="chip" data-g="Soul / Funk" onclick="setCGenre(this)">Soul / Funk</button>
+  <button class="chip" data-g="Hip-Hop" onclick="setCGenre(this)">Hip-Hop</button>
+  <button class="chip" data-g="Neo-Soul / Leftfield" onclick="setCGenre(this)">Neo-Soul</button>
+  <button class="chip" data-g="R&B / Pop" onclick="setCGenre(this)">R&B / Pop</button>
+  <button class="chip" data-g="Electronic" onclick="setCGenre(this)">Electronic</button>
+  <button class="chip" data-g="Rock / New Wave" onclick="setCGenre(this)">Rock</button>
+  <button class="chip" data-g="Reggae" onclick="setCGenre(this)">Reggae</button>
+  <button class="chip" data-g="Jazz" onclick="setCGenre(this)">Jazz</button>
+  <button class="chip" data-g="Disco / Pop" onclick="setCGenre(this)">Disco</button>
+</div>
+<div class="sort-strip" id="csort">
+  <span class="sort-label">Sort</span>
+  <button class="sb sa" id="sb-az" onclick="setSort('az')">A–Z</button>
+  <button class="sb" id="sb-yr" onclick="setSort('yr')">Year</button>
+  <button class="sb" id="sb-val" onclick="setSort('val')">Value</button>
+</div>
+
+<!-- Wishlist: tier filter, then genre filter, then sort -->
+<div class="chips" id="wchips" style="display:none">
+  <button class="chip chip-all chip-a" data-t="" onclick="setTier(this)">All</button>
+  <button class="chip chip-sh" data-t="sh" onclick="setTier(this)">S/H</button>
+  <button class="chip chip-store" data-t="store" onclick="setTier(this)">Store</button>
+  <button class="chip chip-hmv" data-t="hmvdeal" onclick="setTier(this)">HMV 3-for</button>
+  <button class="chip chip-patience" data-t="patience" onclick="setTier(this)">Patience</button>
+  <button class="chip chip-sp" data-t="sp" onclick="setTier(this)">Spotify</button>
+</div>
+<div class="chips" id="wgenre-chips" style="display:none">
+  <button class="chip chip-all chip-a" data-g="" onclick="setWGenre(this)">All genres</button>
+  <button class="chip" data-g="Motown" onclick="setWGenre(this)">Motown</button>
+  <button class="chip" data-g="Soul / Funk" onclick="setWGenre(this)">Soul / Funk</button>
+  <button class="chip" data-g="Hip-Hop" onclick="setWGenre(this)">Hip-Hop</button>
+  <button class="chip" data-g="Neo-Soul / Leftfield" onclick="setWGenre(this)">Neo-Soul</button>
+  <button class="chip" data-g="Electronic" onclick="setWGenre(this)">Electronic</button>
+  <button class="chip" data-g="Rock / New Wave" onclick="setWGenre(this)">Rock</button>
+  <button class="chip" data-g="Jazz" onclick="setWGenre(this)">Jazz</button>
+</div>
+<div class="sort-strip" id="wsort" style="display:none">
+  <span class="sort-label">Sort</span>
+  <button class="sb sa" id="sb-waz" onclick="setWSort('az')">A–Z</button>
+  <button class="sb" id="sb-wyr" onclick="setWSort('yr')">Year</button>
+  <button class="sb" id="sb-wprice" onclick="setWSort('price')">Price</button>
+</div>
+
+<div class="scroll-area" id="scroll-area">
+  <div class="list visible" id="list-c"></div>
+  <div class="list" id="list-w"></div>
+  <div class="empty" id="empty">Nothing found</div>
+  <div class="legend" id="dlegend">
+    <div class="li"><div class="ld" style="background:linear-gradient(135deg,#FF7300,#FFD100)"></div><span>70s</span></div>
+    <div class="li"><div class="ld" style="background:linear-gradient(135deg,#00C900,#FFD100)"></div><span>80s</span></div>
+    <div class="li"><div class="ld" style="background:linear-gradient(135deg,#00C900,#0075FF)"></div><span>90s/00s</span></div>
+    <div class="li"><div class="ld" style="background:linear-gradient(135deg,#0075FF,#9A4CFF)"></div><span>10s</span></div>
+    <div class="li"><div class="ld" style="background:linear-gradient(135deg,#FFD100,#FF7300,#9A4CFF)"></div><span>20s</span></div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+// ── Artwork ────────────────────────────────────────────────────
+// Fetches via /api/artwork (Vercel serverless proxy → iTunes).
+// Results cached in localStorage indefinitely — lookup happens once per
+// record ever. Images are injected the moment each fetch resolves,
+// not batched or gated on scroll.
+
+const CACHE_KEY = 'vinyl_art_v3'; // v3 = Discogs source
+let artCache = {};
+try { artCache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}'); } catch {}
+
+function saveCache() {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify(artCache)); } catch {}
+}
+
+async function fetchArt(artist, title) {
+  const key = artist + '|' + title;
+  if (key in artCache) return artCache[key];
+
+  try {
+    const r = await fetch(
+      `/api/artwork?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`,
+      { signal: AbortSignal.timeout(8000) }
+    );
+    if (r.ok) {
+      const d = await r.json();
+      artCache[key] = d.url || null;
+      saveCache();
+      return artCache[key];
+    }
+  } catch {}
+
+  artCache[key] = null;
+  saveCache();
+  return null;
+}
+
+const PLACEHOLDER = `<div class="art-placeholder"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></div>`;
+
+function injectArt(el, url) {
+  const ph = el.querySelector('.art-placeholder');
+  if (!ph) return;
+  if (!url) return; // leave placeholder
+  const img = document.createElement('img');
+  img.className = 'art';
+  img.src = url;
+  img.onerror = () => img.replaceWith(ph.cloneNode(true));
+  ph.replaceWith(img);
+}
+
+// Fire off fetches for every record at once.
+// Each resolves independently and updates the DOM immediately.
+function loadAllArt() {
+  document.querySelectorAll('.record[data-artist]').forEach(el => {
+    if (el.dataset.artLoaded) return;
+    el.dataset.artLoaded = '1';
+
+    const cached = artCache[el.dataset.artist + '|' + el.dataset.title];
+    if (cached !== undefined) {
+      // Already in cache — apply synchronously
+      injectArt(el, cached);
+      return;
+    }
+
+    // Not cached — fetch and inject when ready
+    fetchArt(el.dataset.artist, el.dataset.title).then(url => injectArt(el, url));
+  });
+}
+
+// ── Helpers ────────────────────────────────────────────────────
+function dc(y){const yr=parseInt(y)||0;if(yr>=2020)return'd20';if(yr>=2010)return'd10';if(yr>=2000)return'd00';if(yr>=1990)return'd90';if(yr>=1980)return'd80';return'd70'}
+
+function hmvBadge(note){
+  return note==='deal' ? `<span class="badge b-hmvdeal">HMV 3-for ✓</span>` : '';
+}
+function tierBadge(t, hmvNote){
+  if(t==='hmv' && hmvNote==='deal') return '';
+  const m={sh:['S/H','b-sh'],store:['Store','b-store'],hmv:['HMV 3-for','b-hmv'],patience:['Patience','b-patience']};
+  const[l,c]=m[t]||['',''];return l?`<span class="badge ${c}">${l}</span>`:'';
+}
+
+// ── Build lists ────────────────────────────────────────────────
+function buildC(){
+  const el=document.getElementById('list-c');el.innerHTML='';
+  COLL.forEach(([a,t,y,v,g])=>{
+    const d=document.createElement('div');
+    d.className='record '+dc(y);
+    d.dataset.search=(a+' '+t+' '+g).toLowerCase();
+    d.dataset.year=y;d.dataset.val=v;d.dataset.genre=g;
+    d.dataset.az=a.replace(/^The /,'').toLowerCase();
+    d.dataset.artist=a;d.dataset.title=t;
+    d.innerHTML=`${PLACEHOLDER}
+<div class="record-info">
+  <div class="r-artist">${a}</div>
+  <div class="r-title">${t}</div>
+  <div class="r-meta"><span class="r-year">${y}</span><span class="r-price orange">~£${v}</span><span class="r-genre">${g}</span></div>
+</div>`;
+    el.appendChild(d);
+  });
+  const tot=COLL.reduce((s,r)=>s+r[3],0);
+  document.getElementById('hero-val').textContent='£'+tot.toLocaleString();
+  document.getElementById('s-count').textContent=COLL.length;
+  document.getElementById('s-avg').textContent='£'+Math.round(tot/COLL.length);
+  document.getElementById('s-wish').textContent='£'+WISH.reduce((s,r)=>s+r[3],0).toLocaleString();
+}
+
+function buildW(){
+  const el=document.getElementById('list-w');el.innerHTML='';
+  WISH.forEach(([a,t,y,p,tier,sp,g,hmvNote])=>{
+    const d=document.createElement('div');
+    d.className='record '+dc(y);
+    d.dataset.search=(a+' '+t+' '+g).toLowerCase();
+    d.dataset.tier=tier;d.dataset.sp=sp?'1':'';
+    d.dataset.hmv=hmvNote==='deal'?'1':'';
+    d.dataset.year=y;d.dataset.val=p;d.dataset.genre=g;
+    d.dataset.az=a.replace(/^The /,'').toLowerCase();
+    d.dataset.artist=a;d.dataset.title=t;
+    const qa=a.replace(/"/g,'&quot;');const qt=t.replace(/"/g,'&quot;');
+    d.innerHTML=`${PLACEHOLDER}
+<div class="record-info">
+  <div class="r-artist">${a}</div>
+  <div class="r-title">${t}</div>
+  <div class="r-meta"><span class="r-year">${y}</span><span class="r-price blue">~£${p}</span><span class="r-genre">${g}</span>${tierBadge(tier,hmvNote)}${sp?'<span class="badge b-sp">Spotify</span>':''}${hmvBadge(hmvNote)}</div>
+  <button class="btn-purchased" onclick="markPurchased(this)" data-artist="${qa}" data-title="${qt}" data-year="${y}" data-val="${p}" data-genre="${g}">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    Purchased
+  </button>
+</div>`;
+    el.appendChild(d);
+  });
+}
+
+// ── Sort ───────────────────────────────────────────────────────
+function sortList(id,key){
+  const el=document.getElementById(id);
+  const items=[...el.querySelectorAll('.record')];
+  items.sort((a,b)=>{
+    if(key==='az')return a.dataset.az.localeCompare(b.dataset.az);
+    if(key==='yr')return parseInt(a.dataset.year)-parseInt(b.dataset.year);
+    if(key==='val'||key==='price')return parseInt(b.dataset.val)-parseInt(a.dataset.val);
+    return 0;
+  });
+  items.forEach(i=>el.appendChild(i));
+}
+
+let AT='c',TIER='',CSORT='az',WSORT='az',CGENRE='',WGENRE='';
+
+function setSort(s){
+  CSORT=s;
+  ['az','yr','val'].forEach(k=>document.getElementById('sb-'+k).classList.toggle('sa',k===s));
+  sortList('list-c',s);filter();
+}
+function setWSort(s){
+  WSORT=s;
+  ['az','yr','price'].forEach(k=>document.getElementById('sb-w'+k).classList.toggle('sa',k===s));
+  sortList('list-w',s);filter();
+}
+function setCGenre(el){
+  CGENRE=el.dataset.g;
+  document.querySelectorAll('#cgenre-chips .chip').forEach(c=>c.classList.remove('chip-a'));
+  el.classList.add('chip-a');filter();
+}
+function setWGenre(el){
+  WGENRE=el.dataset.g;
+  document.querySelectorAll('#wgenre-chips .chip').forEach(c=>c.classList.remove('chip-a'));
+  el.classList.add('chip-a');filter();
+}
+function switchTab(tab){
+  AT=tab;TIER='';CGENRE='';WGENRE='';
+  document.getElementById('search').value='';
+  document.getElementById('tab-c').className='tab'+(tab==='c'?' ac':'');
+  document.getElementById('tab-w').className='tab'+(tab==='w'?' aw':'');
+  document.getElementById('list-c').classList.toggle('visible',tab==='c');
+  document.getElementById('list-w').classList.toggle('visible',tab==='w');
+  document.getElementById('cgenre-chips').style.display=tab==='c'?'flex':'none';
+  document.getElementById('csort').style.display=tab==='c'?'flex':'none';
+  document.getElementById('wchips').style.display=tab==='w'?'flex':'none';
+  document.getElementById('wgenre-chips').style.display=tab==='w'?'flex':'none';
+  document.getElementById('wsort').style.display=tab==='w'?'flex':'none';
+  document.getElementById('dlegend').style.display=tab==='c'?'block':'none';
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('chip-a',c.dataset.t===''||c.dataset.g===''));
+  filter();
+  loadAllArt();
+}
+function setTier(el){
+  TIER=el.dataset.t;
+  document.querySelectorAll('#wchips .chip').forEach(c=>c.classList.remove('chip-a'));
+  el.classList.add('chip-a');filter();
+}
+function filter(){
+  const q=document.getElementById('search').value.toLowerCase().trim();
+  const lid=AT==='c'?'list-c':'list-w';
+  const genre=AT==='c'?CGENRE:WGENRE;
+  const recs=document.querySelectorAll('#'+lid+' .record');
+  let n=0;
+  recs.forEach(r=>{
+    const mq=!q||r.dataset.search.includes(q);
+    let mt=true;
+    if(TIER==='sp') mt=r.dataset.sp==='1';
+    else if(TIER==='hmvdeal') mt=r.dataset.hmv==='1';
+    else if(TIER) mt=r.dataset.tier===TIER;
+    const mg=!genre||r.dataset.genre===genre;
+    const show=mq&&mt&&mg;
+    r.style.display=show?'':'none';
+    if(show)n++;
+  });
+  document.getElementById('cpill').textContent=n;
+  document.getElementById('empty').classList.toggle('visible',n===0);
+}
+
+// ── Purchased + Undo ──────────────────────────────────────────
+const PURCH_KEY = 'vinyl_purchased_v1';
+const MANUAL_KEY = 'vinyl_manual_v1';
+function getPurchased() { try { return JSON.parse(localStorage.getItem(PURCH_KEY)||'[]'); } catch { return []; } }
+function savePurchased(l) { try { localStorage.setItem(PURCH_KEY, JSON.stringify(l)); } catch {} }
+function getManual() { try { return JSON.parse(localStorage.getItem(MANUAL_KEY)||'[]'); } catch { return []; } }
+function saveManual(l) { try { localStorage.setItem(MANUAL_KEY, JSON.stringify(l)); } catch {} }
+
+let _toastTimer = null;
+let _lastPurchased = null; // {a,t,y,v,g, cardHTML, wishCard}
+
+function showToast(msg, withUndo) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-undo').style.display = withUndo ? '' : 'none';
+  toast.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => { toast.classList.remove('show'); _lastPurchased = null; }, 4000);
+}
+
+function undoPurchased() {
+  if (!_lastPurchased) return;
+  const {a, t, y, v, g, wishCard} = _lastPurchased;
+
+  // Remove from localStorage
+  savePurchased(getPurchased().filter(r => !(r[0]===a && r[1]===t)));
+
+  // Remove from collection
+  document.querySelectorAll('#list-c .record').forEach(card => {
+    if (card.dataset.artist===a && card.dataset.title===t && card.dataset.fromPurchased==='1') card.remove();
+  });
+
+  // Restore wishlist card
+  if (wishCard) {
+    document.getElementById('list-w').appendChild(wishCard);
+    wishCard.style.opacity = '1';
+  }
+
+  updateStats();
+  filter();
+  document.getElementById('toast').classList.remove('show');
+  _lastPurchased = null;
+}
+
+function markPurchased(btn) {
+  const a=btn.dataset.artist, t=btn.dataset.title, y=btn.dataset.year;
+  const v=parseInt(btn.dataset.val), g=btn.dataset.genre;
+
+  btn.innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Added`;
+  btn.style.opacity='0.5'; btn.disabled=true;
+
+  const purchased=getPurchased();
+  if (!purchased.find(r=>r[0]===a&&r[1]===t)) { purchased.push([a,t,y,v,g]); savePurchased(purchased); }
+
+  const card = btn.closest('.record');
+  card.style.transition='opacity 0.3s'; card.style.opacity='0';
+
+  setTimeout(()=>{
+    card.remove();
+    const collCard = addToCollDOM(a,t,y,v,g,true);
+    _lastPurchased = {a,t,y,v,g,wishCard:card,collCard};
+    updateStats(); filter();
+    showToast(`"${t}" moved to collection`, true);
+  }, 300);
+}
+
+function addToCollDOM(a, t, y, v, g, fromPurchased=false) {
+  const el=document.getElementById('list-c');
+  const d=document.createElement('div');
+  d.className='record '+dc(y);
+  d.dataset.search=(a+' '+t+' '+g).toLowerCase();
+  d.dataset.year=y; d.dataset.val=v; d.dataset.genre=g;
+  d.dataset.az=a.replace(/^The /,'').toLowerCase();
+  d.dataset.artist=a; d.dataset.title=t;
+  if(fromPurchased) d.dataset.fromPurchased='1';
+  d.innerHTML=`${PLACEHOLDER}
+<div class="record-info">
+  <div class="r-artist">${a}</div>
+  <div class="r-title">${t}</div>
+  <div class="r-meta"><span class="r-year">${y}</span><span class="r-price orange">~£${v}</span><span class="r-genre">${g}</span></div>
+</div>`;
+  el.appendChild(d);
+  fetchArt(a,t).then(url=>injectArt(d,url));
+  return d;
+}
+
+function updateStats() {
+  const cc=document.querySelectorAll('#list-c .record');
+  let tot=0; cc.forEach(r=>{tot+=parseInt(r.dataset.val)||0;});
+  document.getElementById('hero-val').textContent='£'+tot.toLocaleString();
+  document.getElementById('s-count').textContent=cc.length;
+  document.getElementById('s-avg').textContent='£'+Math.round(tot/cc.length);
+  const wc=document.querySelectorAll('#list-w .record');
+  let wt=0; wc.forEach(r=>{wt+=parseInt(r.dataset.val)||0;});
+  document.getElementById('s-wish').textContent='£'+wt.toLocaleString();
+}
+
+// ── Manual Add Sheet ──────────────────────────────────────────
+let _selectedResult = null; // {title, year, image, label}
+const GENRES = ['Motown','Soul / Funk','Hip-Hop','Neo-Soul / Leftfield','R&B / Pop','Electronic','Rock / New Wave','Reggae','Jazz','Disco / Pop'];
+
+function openSheet() {
+  document.getElementById('sheet').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('add-artist').focus(), 350);
+}
+function closeSheet() {
+  document.getElementById('sheet').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+  clearConfirm();
+  document.getElementById('add-artist').value='';
+  document.getElementById('add-title').value='';
+  document.getElementById('sheet-results').innerHTML='';
+}
+function clearConfirm() {
+  _selectedResult=null;
+  document.getElementById('sheet-confirm').style.display='none';
+  document.getElementById('sheet-results').style.display='';
+}
+
+async function searchDiscogs() {
+  const artist=document.getElementById('add-artist').value.trim();
+  const title=document.getElementById('add-title').value.trim();
+  if (!artist||!title) return;
+  const btn=document.getElementById('btn-search');
+  btn.disabled=true; btn.textContent='Searching…';
+  document.getElementById('sheet-results').innerHTML='';
+  clearConfirm();
+
+  try {
+    const r=await fetch(`/api/search?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
+    const d=await r.json();
+    renderResults(d.results||[], artist, title);
+  } catch {
+    document.getElementById('sheet-results').innerHTML='<div class="s-notfound">Search failed — check your connection</div>';
+  }
+  btn.disabled=false; btn.textContent='Search';
+}
+
+function renderResults(results, artist, title) {
+  const el=document.getElementById('sheet-results');
+  if (!results.length) {
+    el.innerHTML='<div class="s-notfound">Nothing found — try different spelling</div>';
+    return;
+  }
+  el.innerHTML='';
+  results.forEach((r,i)=>{
+    const div=document.createElement('div');
+    div.className='s-result';
+    // Parse "Artist - Title" format Discogs uses
+    const parts=r.title.split(' - ');
+    const displayTitle=parts.length>1?parts.slice(1).join(' - '):r.title;
+    const displayArtist=parts[0]||artist;
+    div.innerHTML=`${r.image?`<img class="s-art" src="${r.image}" onerror="this.style.display='none'">`:`<div class="s-art"></div>`}
+<div class="s-info">
+  <div class="s-title">${displayArtist} — ${displayTitle}</div>
+  <div class="s-meta">${r.year||'?'} · ${r.label||''}</div>
+</div>`;
+    div.onclick=()=>selectResult(div, {
+      artist: displayArtist, title: displayTitle,
+      year: r.year||'', image: r.image, label: r.label
+    });
+    el.appendChild(div);
+  });
+
+  // Also offer a manual entry option
+  const manual=document.createElement('div');
+  manual.className='s-result';
+  manual.innerHTML=`<div class="s-art" style="display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--muted)">+</div>
+<div class="s-info"><div class="s-title">Add manually</div><div class="s-meta">Use what I typed — no artwork</div></div>`;
+  manual.onclick=()=>selectResult(manual, {artist, title, year:'', image:null, label:''});
+  el.appendChild(manual);
+}
+
+function selectResult(div, data) {
+  document.querySelectorAll('.s-result').forEach(r=>r.classList.remove('selected'));
+  div.classList.add('selected');
+  _selectedResult=data;
+
+  // Build genre picker
+  const gp=document.getElementById('genre-pick');
+  gp.innerHTML='';
+  GENRES.forEach(g=>{
+    const b=document.createElement('button');
+    b.textContent=g; b.dataset.g=g;
+    b.onclick=()=>{gp.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel')};
+    gp.appendChild(b);
+  });
+
+  document.getElementById('sheet-results').style.display='none';
+  document.getElementById('sheet-confirm').style.display='';
+}
+
+function confirmAdd() {
+  if (!_selectedResult) return;
+  const {artist:a, title:t, year:y, image} = _selectedResult;
+  const genreBtn=document.querySelector('#genre-pick button.sel');
+  const g=genreBtn?genreBtn.dataset.g:'Soul / Funk';
+  const v=12; // default estimate — will be overridden by artwork/price fetch
+
+  // Save to manual list
+  const manual=getManual();
+  if (!manual.find(r=>r[0]===a&&r[1]===t)) { manual.push([a,t,y||'',v,g,image||null]); saveManual(manual); }
+
+  // Add to collection DOM
+  const card=addToCollDOM(a,t,y||'',v,g);
+
+  // If we have an image from Discogs, inject it directly
+  if (image) {
+    const ph=card.querySelector('.art-placeholder');
+    if (ph) {
+      const img=document.createElement('img');
+      img.className='art'; img.src=image;
+      img.onerror=()=>img.replaceWith(ph.cloneNode(true));
+      ph.replaceWith(img);
+      // Cache it so future loads use it
+      artCache[a+'|'+t]=image; saveCache();
+    }
+  }
+
+  updateStats(); filter();
+  showToast(`"${t}" added to collection`, false);
+  closeSheet();
+}
+
+// ── Init ───────────────────────────────────────────────────────
+buildC();buildW();
+
+// Restore purchased (from wishlist)
+getPurchased().forEach(([a,t,y,v,g]) => {
+  document.querySelectorAll('#list-w .record').forEach(card => {
+    if (card.dataset.artist===a && card.dataset.title===t) card.remove();
+  });
+  const already=[...document.querySelectorAll('#list-c .record')].some(r=>r.dataset.artist===a&&r.dataset.title===t);
+  if (!already) addToCollDOM(a,t,y,v,g);
+});
+
+// Restore manually added records
+getManual().forEach(([a,t,y,v,g,img]) => {
+  const already=[...document.querySelectorAll('#list-c .record')].some(r=>r.dataset.artist===a&&r.dataset.title===t);
+  if (!already) {
+    const card=addToCollDOM(a,t,y,v,g);
+    if (img) {
+      const ph=card.querySelector('.art-placeholder');
+      if (ph) {
+        const im=document.createElement('img');
+        im.className='art'; im.src=img;
+        im.onerror=()=>im.replaceWith(ph.cloneNode(true));
+        ph.replaceWith(im);
+        artCache[a+'|'+t]=img;
+      }
+    }
+  }
+});
+
+sortList('list-c','az');sortList('list-w','az');
+filter();
+loadAllArt();
+</script>
+</body>
+</html>
