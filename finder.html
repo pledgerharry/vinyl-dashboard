@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>What are we playing? 🎵</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Work+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --black:#0a0a0a;--surface:#111;--surface2:#1a1a1a;--surface3:#222;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.18);
+  --text:#f2ede6;--muted:#777;--faint:#333;
+  --orange:#FF7300;--green:#00C900;--yellow:#FFD100;--blue:#0075FF;--purple:#9A4CFF;
+}
+html,body{min-height:100%;background:var(--black);color:var(--text);font-family:'Work Sans',sans-serif;font-weight:300}
+body{display:flex;flex-direction:column;align-items:center;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,32px)}
+
+.stage{width:100%;max-width:480px;padding:env(safe-area-inset-top,16px) 20px 0;flex:1;display:flex;flex-direction:column}
+
+/* Intro */
+.intro{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px 0}
+.intro-vinyl{font-size:72px;margin-bottom:20px;animation:spin-slow 8s linear infinite;display:inline-block}
+@keyframes spin-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.intro-title{font-family:'Anton',sans-serif;font-size:36px;color:#fff;margin-bottom:10px;line-height:1.1}
+.intro-title em{color:var(--orange);font-style:normal}
+.intro-sub{font-size:15px;color:var(--muted);line-height:1.6;margin-bottom:32px;max-width:300px}
+.intro-btns{display:flex;flex-direction:column;gap:10px;width:100%;max-width:280px}
+.btn-primary{padding:16px 32px;border-radius:100px;border:none;background:linear-gradient(135deg,var(--orange),var(--yellow));color:#000;font-family:'Work Sans',sans-serif;font-weight:700;font-size:16px;cursor:pointer;transition:transform .15s;letter-spacing:0.3px}
+.btn-primary:hover{transform:scale(1.03)}
+.btn-primary:active{transform:scale(0.97)}
+.btn-secondary{padding:14px 32px;border-radius:100px;border:1px solid var(--border2);background:transparent;color:var(--text);font-family:'Work Sans',sans-serif;font-weight:500;font-size:15px;cursor:pointer;transition:all .15s}
+.btn-secondary:hover{background:var(--surface2)}
+.btn-ghost{padding:12px;border:none;background:transparent;color:var(--muted);font-family:'Work Sans',sans-serif;font-size:13px;cursor:pointer}
+
+/* Quiz */
+.quiz{flex:1;display:flex;flex-direction:column;padding-top:44px}
+.progress-wrap{margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.progress-bar{flex:1;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--yellow));border-radius:2px;transition:width .4s cubic-bezier(.34,1.56,.64,1)}
+.progress-label{font-size:11px;color:var(--muted);white-space:nowrap}
+.q-text{font-family:'Anton',sans-serif;font-size:28px;color:#fff;line-height:1.15;margin-bottom:28px}
+.options{display:flex;flex-direction:column;gap:10px}
+.opt{padding:15px 18px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Work Sans',sans-serif;font-size:15px;font-weight:400;cursor:pointer;text-align:left;transition:all .15s;line-height:1.35}
+.opt:hover{border-color:var(--border2);transform:translateX(3px)}
+.opt.selected{border-color:var(--orange);background:rgba(255,115,0,.12);color:var(--orange);transform:translateX(3px)}
+
+/* Thinking */
+.thinking{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding-top:env(safe-area-inset-top,0)}
+.thinking-record{display:block;margin:0 auto}
+.thinking-label{font-family:'Anton',sans-serif;font-size:22px;color:#fff}
+.thinking-sub{font-size:13px;color:var(--muted)}
+
+/* Results */
+.results{flex:1;display:flex;flex-direction:column;padding-top:20px}
+.results-eyebrow{font-size:11px;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:500}
+.results-title{font-family:'Anton',sans-serif;font-size:28px;color:#fff;margin-bottom:4px;line-height:1.1}
+.results-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.pick-card{border-radius:16px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:center;position:relative;overflow:hidden;border:1px solid var(--border)}
+.pick-card.rank-1{background:linear-gradient(135deg,rgba(255,209,0,.08),rgba(255,115,0,.05));border-color:rgba(255,209,0,.25)}
+.pick-card.rank-2{background:var(--surface)}
+.pick-card.rank-3{background:var(--surface);opacity:0.9}
+.pick-badge{position:absolute;top:10px;right:12px;font-size:10px;font-weight:600;font-family:'Work Sans',sans-serif;padding:2px 8px;border-radius:20px;letter-spacing:0.5px}
+.rank-1 .pick-badge{background:rgba(255,209,0,.2);color:var(--yellow)}
+.rank-2 .pick-badge{background:rgba(255,255,255,.08);color:var(--muted)}
+.rank-3 .pick-badge{background:rgba(255,255,255,.05);color:var(--faint)}
+.pick-art{width:64px;height:64px;border-radius:10px;object-fit:cover;background:var(--surface2);flex-shrink:0}
+.pick-art-ph{width:64px;height:64px;border-radius:10px;background:var(--surface2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:28px}
+.pick-info{flex:1;min-width:0;padding-right:40px}
+.pick-artist{font-size:11px;color:var(--muted);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pick-title{font-size:15px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px}
+.pick-tagline{font-size:12px;color:var(--orange);line-height:1.4;font-style:italic}
+.result-actions{margin-top:12px;padding-bottom:8px;display:flex;flex-direction:column;gap:8px}
+.btn-restart{width:100%;padding:14px;border-radius:100px;border:1px solid var(--border2);background:transparent;color:var(--text);font-family:'Work Sans',sans-serif;font-weight:500;font-size:15px;cursor:pointer;transition:all .15s}
+.btn-restart:hover{background:var(--surface2)}
+
+/* Spin result */
+.spin-result{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px 0}
+.spin-art-big{width:180px;height:180px;border-radius:16px;object-fit:cover;background:var(--surface2);margin:0 auto 20px;display:block;border:0.5px solid var(--border2)}
+.spin-art-big-ph{width:180px;height:180px;border-radius:16px;background:var(--surface2);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:56px;border:0.5px solid var(--border2)}
+.spin-artist{font-size:14px;color:var(--muted);margin-bottom:4px}
+.spin-title{font-family:'Anton',sans-serif;font-size:28px;color:#fff;margin-bottom:6px;line-height:1.1}
+.spin-genre{font-size:12px;color:var(--orange);margin-bottom:28px}
+.spin-btns{display:flex;flex-direction:column;gap:8px;width:100%;max-width:280px}
+
+/* Browse / collection view */
+.browse{flex:1;display:flex;flex-direction:column}
+.browse-header{padding:20px 0 10px;display:flex;flex-direction:column;gap:8px}
+.browse-title{font-family:'Anton',sans-serif;font-size:24px;color:#fff}
+.search-wrap{position:relative}
+.search-input{width:100%;background:var(--surface);border:0.5px solid var(--border);border-radius:10px;padding:10px 12px 10px 34px;color:var(--text);font-family:'Work Sans',sans-serif;font-size:16px;font-weight:300;outline:none;-webkit-appearance:none}
+.search-input::placeholder{color:var(--muted)}
+.search-input:focus{border-color:var(--border2)}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.genre-chips{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px}
+.genre-chips::-webkit-scrollbar{display:none}
+.gchip{padding:5px 12px;border-radius:20px;border:0.5px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-family:'Work Sans',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s}
+.gchip.active{border-color:var(--orange);color:var(--orange);background:rgba(255,115,0,.08)}
+.browse-grid{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-bottom:24px}
+.browse-grid::-webkit-scrollbar{display:none}
+.b-card{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;overflow:hidden;cursor:default}
+.b-art{width:100%;aspect-ratio:1;object-fit:cover;background:var(--surface2);display:block}
+.b-art-ph{width:100%;aspect-ratio:1;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:36px}
+.b-info{padding:8px 10px}
+.b-artist{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.b-title{font-size:13px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.b-genre{font-size:10px;color:var(--orange);margin-top:3px;font-style:italic}
+.b-empty{grid-column:1/-1;text-align:center;padding:48px 0;color:var(--muted);font-size:14px}
+.back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--muted);font-family:'Work Sans',sans-serif;font-size:13px;cursor:pointer;padding:0;margin-bottom:4px}
+.back-btn:hover{color:var(--text)}
+
+@keyframes slide-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.animate-in{animation:slide-up .35s cubic-bezier(.34,1.1,.64,1) forwards}
+.pick-card{animation:slide-up .35s cubic-bezier(.34,1.1,.64,1) both}
+.pick-card:nth-child(1){animation-delay:.05s}
+.pick-card:nth-child(2){animation-delay:.15s}
+.pick-card:nth-child(3){animation-delay:.25s}
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+  <!-- Intro injected by JS -->
+</div>
+
+<script>
+const COLLECTION_URL = '/api/sheets';
+const FINDER_URL = '/api/finder';
+
+const THINKING_LABELS = [
+  ['Diggin through a crate…','give us a sec'],
+  ['Questioning your taste…','just kidding, stay with us'],
+  ['Consulting the oracle…','it takes time to be this good'],
+  ['Reading the vibes…','almost there'],
+  ['Flipping through the stacks…','nearly got it'],
+  ['Having a heated debate…','about what you actually want'],
+  ['Checking the tracklist…','this one might be it'],
+  ['Overruling the first instinct…','trust the process'],
+  ['Ignoring the obvious choices…','you deserve better than obvious'],
+  ['Ruling out the bad suggestions…','there were many'],
+];
+
+// Inline vinyl SVG — a proper record, not a CD
+const VINYL_SVG = `<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 94.96 94.96" style="width:100%;height:100%">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0" y1="47.48" x2="94.96" y2="47.48" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#00c900"/>
+      <stop offset="1" stop-color="#ffd100"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient1" x1="45.49" y1="47.51" x2="49.54" y2="47.51" xlink:href="#linear-gradient"/>
+  </defs>
+  <path fill="url(#linear-gradient)" d="M92.96,33.96c-3.6-12.2-11.7-22.2-22.9-28.2S46.06-1.64,33.96,1.96C21.76,5.56,11.76,13.66,5.76,24.86S-1.64,48.86,1.96,60.96c3.6,12.2,11.7,22.2,22.9,28.2,7,3.8,14.8,5.8,22.6,5.8,4.5,0,9.1-.7,13.6-2,12.2-3.6,22.2-11.7,28.2-22.9,6-11.1,7.3-24,3.7-36.1ZM27.96,51.86c.5-.2,1.1.2,1.3.7v.2c1.4,4.9,4.6,8.9,9,11.3.2.1.4.2.6.3.5.3.7.9.5,1.4-.2.4-.5.6-.9.6-.2,0-.3,0-.5-.1s-.5-.2-.7-.4c-4.9-2.7-8.5-7.2-10-12.5l-.1-.2c0-.6.3-1.2.8-1.3ZM13.26,47.16c.6,0,1,.4,1,1,.1,3.7.8,7.4,2.1,10.9,2.6,7.1,7.4,12.8,13.8,16.7.5.3.6.9.3,1.4-.2.3-.5.5-.9.5-.2,0-.4,0-.5-.1-6.8-4.1-11.9-10.2-14.7-17.7-1.4-3.7-2.2-7.6-2.2-11.6.1-.6.5-1.1,1.1-1.1ZM30.76,85.16c-.2.4-.5.6-.9.6-.1,0-.3,0-.4-.1-1.7-.8-3.3-1.7-4.9-2.7-8.6-5.5-14.8-13.9-17.7-23.6-.2-.5.2-1.1.7-1.3s1.1.1,1.3.7c2.7,9.2,8.7,17.2,16.8,22.5,1.5,1,3,1.8,4.6,2.6.5.2.7.8.5,1.3ZM41.26,73.86c-.1.4-.5.7-1,.7h-.3c-.5-.1-.9-.3-1.4-.4-1.6-.5-3.2-1.2-4.7-2.1-6.5-3.7-11.3-9.6-13.4-16.8-.6-2.2-1-4.4-1.1-6.6,0-.6.4-1,1-1.1.5,0,1,.4,1.1,1,.1,2.1.4,4.1,1,6.1,1.9,6.7,6.3,12.2,12.4,15.6,1.4.8,2.9,1.4,4.4,1.9.4.1.9.3,1.3.4.5.2.9.7.7,1.3ZM53.76,59.26c-6.5,3.5-14.6,1-18.1-5.5s-1-14.6,5.5-18.1,14.6-1,18.1,5.5c3.5,6.5,1,14.7-5.5,18.1ZM66.96,43.06h-.3c-.4,0-.9-.3-1-.7v-.2c-1.4-4.9-4.6-8.9-9-11.3-.2-.1-.4-.2-.7-.3-.5-.3-.7-.9-.4-1.4.3-.5.9-.7,1.4-.4.2.1.5.2.7.4,4.9,2.7,8.5,7.2,10,12.5l.1.2c0,.5-.3,1.1-.8,1.2ZM74.56,47.36s-.1,0,0,0c-.6,0-1-.4-1.1-1-.1-2.1-.4-4.1-1-6.1-1.9-6.7-6.3-12.2-12.4-15.6-1.4-.8-2.9-1.4-4.4-1.9-.4-.1-.9-.3-1.3-.4-.5-.1-.9-.7-.7-1.2.1-.5.7-.9,1.2-.7.5.1.9.3,1.4.4,1.6.5,3.2,1.2,4.7,2.1,6.6,3.6,11.4,9.5,13.5,16.7.6,2.2,1,4.4,1.1,6.6,0,.6-.5,1-1,1.1ZM81.66,47.76h0c-.6,0-1-.4-1-1-.1-3.7-.8-7.4-2.1-10.9-2.6-7.1-7.4-12.8-13.8-16.7-.5-.3-.6-.9-.3-1.4.3-.5.9-.6,1.4-.3,6.8,4.1,11.9,10.2,14.7,17.7,1.4,3.7,2.2,7.6,2.2,11.6-.1.5-.5,1-1.1,1ZM87.36,36.76h-.3c-.4,0-.8-.3-1-.7-2.7-9.2-8.7-17.2-16.8-22.5-1.5-1-3-1.8-4.6-2.6-.5-.2-.7-.8-.5-1.4.2-.5.8-.7,1.4-.5,1.7.8,3.3,1.7,4.9,2.7,8.5,5.5,14.8,13.9,17.6,23.6.1.7-.2,1.3-.7,1.4Z"/>
+  <path fill="url(#linear-gradient1)" d="M48.06,45.56c-1.1-.3-2.2.3-2.5,1.4-.3,1.1.3,2.2,1.4,2.5,1.1.3,2.2-.3,2.5-1.4.3-1.1-.3-2.2-1.4-2.5Z"/>
+</svg>`;
+const VINYL_BIG = VINYL_SVG;
+
+let collection = [];
+let answers = [];
+let questionsSoFar = [];
+let currentQ = null;
+let browseGenre = '';
+let browseSearch = '';
+
+async function loadCollection() {
+  try {
+    const r = await fetch(COLLECTION_URL);
+    if (r.ok) {
+      const d = await r.json();
+      collection = (d.collection || []).map(r => ({
+        artist: String(r.artist || ''),
+        title: String(r.title === 0.999 ? '99.9%' : r.title || ''),
+        year: String(r.year || ''),
+        genre: String(r.genre || ''),
+        releaseId: String(r.releaseId || ''),
+        image: String(r.image || '')
+      })).filter(r => r.artist);
+      showIntro();
+    }
+  } catch { showIntro(); }
+}
+
+function setScreen(html) {
+  document.getElementById('stage').innerHTML = html;
+}
+
+function showIntro() {
+  setScreen(`
+    <div class="intro animate-in">
+      <div class="intro-vinyl" style="width:80px;height:80px;margin:0 auto 20px">${VINYL_BIG}</div>
+      <div class="intro-title">Find your <em>record</em></div>
+      <div class="intro-sub">Answer five questions and we'll find the perfect record for your vibe right now.</div>
+      <div class="intro-btns">
+        <button class="btn-primary" onclick="startQuiz()">Help me choose →</button>
+        <button class="btn-secondary" onclick="doSpin()">🎲 Random spin</button>
+        <button class="btn-ghost" onclick="showBrowse()">Browse the full collection</button>
+      </div>
+    </div>`);
+}
+
+// ── Quiz ──────────────────────────────────────────────────────
+function startQuiz() {
+  answers = [];
+  questionsSoFar = [];
+  nextQuestion();
+}
+
+function randomThinking(forResults) {
+  const t = forResults
+    ? [['Flipping through the stacks…','nearly got it'],['Consulting the oracle…','give us a moment'],['Reading the vibes…','this is important work']]
+    : THINKING_LABELS;
+  const [label, sub] = t[Math.floor(Math.random() * t.length)];
+  return `<div class="thinking"><div class="thinking-record" style="width:72px;height:72px;animation:spin-slow 3s linear infinite">${VINYL_BIG}</div><div class="thinking-label">${label}</div><div class="thinking-sub">${sub}</div></div>`;
+}
+
+async function nextQuestion() {
+  setScreen(randomThinking(false));
+  try {
+    const r = await fetch(FINDER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'question', collection, answers, questionsSoFar })
+    });
+    const d = await r.json();
+    currentQ = d.question;
+    questionsSoFar.push({ id: currentQ.id, q: currentQ.q });
+    showQuestion(currentQ);
+  } catch {
+    setScreen(`<div class="intro"><div style="font-size:52px">😕</div><div class="intro-title">Something went wrong</div><button class="btn-primary" onclick="startQuiz()" style="margin-top:24px">Try again</button></div>`);
+  }
+}
+
+function showQuestion(q) {
+  const qNum = answers.length + 1;
+  const progress = Math.round((qNum / 6) * 100);
+  setScreen(`
+    <div class="quiz animate-in">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+        <div class="progress-label">${qNum} of 5</div>
+      </div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">
+        ${q.opts.map((o, i) => `<button class="opt" onclick="selectAnswer(${i})">${o}</button>`).join('')}
+      </div>
+    </div>`);
+}
+
+async function selectAnswer(idx) {
+  const opt = currentQ.opts[idx];
+  document.querySelectorAll('.opt').forEach((el, i) => {
+    el.classList.toggle('selected', i === idx);
+    el.disabled = true;
+  });
+  answers.push({ q: currentQ.q, a: opt, id: currentQ.id });
+  if (answers.length >= 5) { setTimeout(getRecommendations, 450); }
+  else { setTimeout(nextQuestion, 450); }
+}
+
+async function getRecommendations() {
+  setScreen(randomThinking(true));
+  try {
+    const r = await fetch(FINDER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'recommend', collection, answers })
+    });
+    const d = await r.json();
+    showResults(d.picks || []);
+  } catch {
+    setScreen(`<div class="intro"><div style="font-size:52px">😕</div><div class="intro-title">Something went wrong</div><button class="btn-primary" onclick="startQuiz()" style="margin-top:24px">Try again</button></div>`);
+  }
+}
+
+async function showResults(picks) {
+  const cardsHtml = picks.map(p => {
+    const collRecord = collection.find(r =>
+      r.artist.toLowerCase() === p.artist.toLowerCase() &&
+      r.title.toLowerCase() === p.title.toLowerCase()
+    );
+    const imgSrc = (collRecord?.image && collRecord.image.startsWith('http')) ? collRecord.image : '';
+    const artHtml = imgSrc
+      ? `<img class="pick-art" src="${imgSrc}" onerror="this.replaceWith(document.createElement('div'))">`
+      : `<div class="pick-art-ph">${VINYL_SVG}</div>`;
+    const badges = ['🥇 Perfect match', '🥈 Close second', '🥉 Dark horse'];
+    return `
+      <div class="pick-card rank-${p.rank}">
+        <div class="pick-badge">${badges[p.rank-1]||''}</div>
+        ${artHtml}
+        <div class="pick-info">
+          <div class="pick-artist">${p.artist}</div>
+          <div class="pick-title">${p.title}</div>
+          <div class="pick-tagline">${p.tagline}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  setScreen(`
+    <div class="results">
+      <div class="results-eyebrow">Your picks are in</div>
+      <div class="results-title">Here's what<br>we reckon 🎯</div>
+      <div class="results-sub">Based on your vibes</div>
+      ${cardsHtml}
+      <div class="result-actions">
+        <button class="btn-restart" onclick="startQuiz()">↺ Try again with different answers</button>
+        <button class="btn-ghost" onclick="showIntro()">← Back to start</button>
+      </div>
+    </div>`);
+
+  picks.forEach(async (p) => {
+    const collRecord = collection.find(r =>
+      r.artist.toLowerCase() === p.artist.toLowerCase() &&
+      r.title.toLowerCase() === p.title.toLowerCase()
+    );
+    // Only skip if we genuinely have a non-empty image URL
+    if (collRecord?.image && collRecord.image.startsWith('http')) return;
+    try {
+      const rid = collRecord?.releaseId || '';
+      let url = `/api/artwork?artist=${encodeURIComponent(p.artist)}&title=${encodeURIComponent(p.title)}`;
+      if (rid) url += `&releaseId=${encodeURIComponent(rid)}`;
+      const r = await fetch(url);
+      if (r.ok) {
+        const d = await r.json();
+        if (d.url) {
+          document.querySelectorAll('.pick-art-ph').forEach(ph => {
+            const titleEl = ph.closest('.pick-card')?.querySelector('.pick-title');
+            if (titleEl?.textContent === p.title) {
+              const img = document.createElement('img');
+              img.className = 'pick-art'; img.src = d.url;
+              ph.replaceWith(img);
+            }
+          });
+        }
+      }
+    } catch {}
+  });
+}
+
+// ── Random spin ───────────────────────────────────────────────
+function doSpin() {
+  if (!collection.length) return;
+  const r = collection[Math.floor(Math.random() * collection.length)];
+  showSpinResult(r);
+}
+
+function showSpinResult(r) {
+  const hasImg = r.image && r.image.startsWith('http');
+  const imgHtml = hasImg
+    ? `<img class="spin-art-big" src="${r.image}" onerror="this.style.display='none'">`
+    : `<div class="spin-art-big-ph" id="spin-ph">${VINYL_BIG}</div>`;
+  setScreen(`
+    <div class="spin-result animate-in">
+      <div style="width:180px;height:180px;margin:0 auto 20px;border-radius:50%;overflow:hidden;border:0.5px solid var(--border2)">${hasImg ? `<img class="spin-art-big" src="${r.image}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">` : `<div id="spin-ph" style="width:100%;height:100%;animation:spin-slow 4s linear infinite">${VINYL_BIG}</div>`}</div>
+      <div class="spin-artist">${r.artist}</div>
+      <div class="spin-title">${r.title}</div>
+      <div class="spin-genre">${r.year} · ${r.genre}</div>
+      <div class="spin-btns">
+        <button class="btn-primary" onclick="doSpin()">🎲 Spin again</button>
+        <button class="btn-ghost" onclick="showIntro()">← Back</button>
+      </div>
+    </div>`);
+
+  // Fetch artwork if not already present
+  if (!hasImg) {
+    const rid = r.releaseId || '';
+    let url = `/api/artwork?artist=${encodeURIComponent(r.artist)}&title=${encodeURIComponent(r.title)}`;
+    if (rid) url += `&releaseId=${encodeURIComponent(rid)}`;
+    fetch(url).then(res => res.json()).then(d => {
+      if (d.url) {
+        const ph = document.getElementById('spin-ph');
+        if (ph) {
+          const img = document.createElement('img');
+          img.style.cssText = 'width:100%;height:100%;object-fit:cover';
+          img.src = d.url;
+          ph.replaceWith(img);
+        }
+      }
+    }).catch(() => {});
+  }
+}
+
+// ── Browse collection ─────────────────────────────────────────
+function showBrowse() {
+  browseGenre = '';
+  browseSearch = '';
+
+  const genres = [...new Set(collection.map(r => r.genre).filter(Boolean))].sort();
+  const chipsHtml = buildChips(genres);
+
+  setScreen(`
+    <div class="browse">
+      <div class="browse-header">
+        <button class="back-btn" onclick="showIntro()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
+        <div class="browse-title">The collection</div>
+        <div class="search-wrap">
+          <svg class="search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="search-input" id="browse-search" placeholder="Search artist or title…" oninput="browseSearch=this.value;updateBrowseGrid()">
+        </div>
+        <div class="genre-chips" id="browse-chips">${chipsHtml}</div>
+      </div>
+      <div class="browse-grid" id="browse-grid"></div>
+    </div>`);
+
+  updateBrowseGrid();
+}
+
+function buildChips(genres) {
+  return ['All', ...genres].map(g => {
+    const val = g === 'All' ? '' : g;
+    const label = g === 'All' ? 'All' : g.replace('Neo-Soul / Leftfield', 'Neo-Soul');
+    return `<button class="gchip${browseGenre === val ? ' active' : ''}" onclick="setBrowseGenre('${val}')">${label}</button>`;
+  }).join('');
+}
+
+function updateBrowseGrid() {
+  const filtered = collection.filter(r => {
+    const matchGenre = !browseGenre || r.genre === browseGenre;
+    const q = browseSearch.toLowerCase();
+    const matchSearch = !q || r.artist.toLowerCase().includes(q) || r.title.toLowerCase().includes(q);
+    return matchGenre && matchSearch;
+  }).sort((a, b) => a.artist.localeCompare(b.artist));
+
+  const grid = document.getElementById('browse-grid');
+  if (!grid) return;
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="b-empty">Nothing found</div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map((r, i) => `
+    <div class="b-card">
+      <div class="b-art-ph" id="bart-${i}">${VINYL_SVG}</div>
+      <div class="b-info">
+        <div class="b-artist">${r.artist}</div>
+        <div class="b-title">${r.title}</div>
+        <div class="b-genre">${r.genre}</div>
+      </div>
+    </div>`).join('');
+
+  // Lazy fetch artwork for each card
+  filtered.forEach((r, i) => {
+    const imgSrc = r.image && r.image.startsWith('http') ? r.image : null;
+    if (imgSrc) {
+      injectBrowseArt(i, imgSrc);
+    } else {
+      const rid = r.releaseId || '';
+      let url = `/api/artwork?artist=${encodeURIComponent(r.artist)}&title=${encodeURIComponent(r.title)}`;
+      if (rid) url += `&releaseId=${encodeURIComponent(rid)}`;
+      // Stagger requests to avoid hammering
+      setTimeout(() => {
+        fetch(url).then(res => res.json()).then(d => {
+          if (d.url) injectBrowseArt(i, d.url);
+        }).catch(() => {});
+      }, i * 80);
+    }
+  });
+}
+
+function injectBrowseArt(idx, url) {
+  const ph = document.getElementById(`bart-${idx}`);
+  if (!ph) return;
+  const img = document.createElement('img');
+  img.className = 'b-art';
+  img.src = url;
+  img.loading = 'lazy';
+  img.onerror = () => {}; // keep placeholder on error
+  ph.replaceWith(img);
+}
+
+function setBrowseGenre(g) {
+  browseGenre = g;
+  const genres = [...new Set(collection.map(r => r.genre).filter(Boolean))].sort();
+  const chips = document.getElementById('browse-chips');
+  if (chips) chips.innerHTML = buildChips(genres);
+  updateBrowseGrid();
+}
+
+// ── Init ──────────────────────────────────────────────────────
+setScreen(`<div class="thinking"><div class="thinking-record" style="width:72px;height:72px;animation:spin-slow 3s linear infinite">${VINYL_BIG}</div><div class="thinking-label">Loading…</div></div>`);
+loadCollection();
+</script>
+</body>
+</html>
