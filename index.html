@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vinyl.">
+<meta name="theme-color" content="#FF5A1F">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<title>Vinyl.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Martian+Mono:wdth,wght@75..112.5,400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#ECEAE4;--surface:#FFFFFF;--ink:#121212;--muted:#56544E;
+  --shell:#FF5A1F;--on-shell:#121212;--on-shell-muted:#3A1505;
+  --sticker:#C6F432;--on-sticker:#121212;
+  --on-ink:#ECEAE4;--paper-text:#FFFDF8;
+  --rule:2.5px;--row-rule:1.5px;
+  --shadow-sm:4px 4px 0 var(--ink);--shadow-lg:6px 6px 0 var(--ink);
+  --sans:'Archivo',Helvetica,Arial,sans-serif;--mono:'Martian Mono',ui-monospace,Menlo,monospace;
+  --top:max(env(safe-area-inset-top),20px);--bottom:env(safe-area-inset-bottom,0px);
+  --tabbar-h:calc(64px + var(--bottom));
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.4;-webkit-tap-highlight-color:transparent}
+::selection{background:var(--ink);color:var(--on-ink)}
+input::placeholder{color:var(--muted);opacity:1}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+img{display:block}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px;box-shadow:0 0 0 5px var(--surface)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.mono{font-family:var(--mono)}
+[hidden]{display:none!important}
+
+/* ── Shell ── */
+.app{min-height:100vh;min-height:100dvh}
+.view{padding-bottom:calc(var(--tabbar-h) + 24px)}
+.view.has-dock{padding-bottom:calc(var(--tabbar-h) + 96px)}
+.band{background:var(--shell);color:var(--on-shell);border-bottom:var(--rule) solid var(--ink);padding:calc(var(--top) + 20px) 20px 14px;display:flex;flex-direction:column;gap:8px}
+.top{position:sticky;top:0;z-index:20}
+.band-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.h1{font-size:34px;font-weight:900;font-stretch:72%;letter-spacing:-1px;line-height:1}
+.dot{color:var(--surface);-webkit-text-stroke:1.5px var(--ink)}
+.band-value{font-family:var(--mono);font-size:28px;font-weight:700;font-stretch:80%;letter-spacing:-1.5px;line-height:1}
+.band-meta{font-size:14px;font-weight:600;color:var(--on-shell-muted)}
+.band-meta .mono{font-size:13px}
+.band.compact .band-hide{display:none}
+.band.compact{padding-top:calc(var(--top) + 8px);padding-bottom:10px}
+.band.compact .h1{font-size:26px}
+.band.compact .band-value{font-size:20px}
+.chg{display:inline-block;transform:rotate(-4deg);padding:3px 8px;background:var(--sticker);color:var(--on-sticker);border:2px solid var(--ink);font-family:var(--mono);font-size:12px;font-weight:700;white-space:nowrap}
+
+/* ── Controls ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 12px;border:var(--rule) solid var(--ink);background:var(--surface);color:var(--ink);font:800 16px var(--sans);text-decoration:none;text-align:center}
+.btn-primary{background:var(--shell);color:var(--on-shell);box-shadow:var(--shadow-sm)}
+.btn-primary:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.btn-ink{background:var(--ink);color:var(--on-ink)}
+.btn-text{border:none;background:transparent;min-height:44px;padding:0 8px;font-weight:700;font-size:15px;text-decoration:underline;text-underline-offset:3px}
+.btn:disabled{opacity:.5;cursor:default}
+.icon-btn{width:44px;height:44px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;border:var(--rule) solid var(--ink);background:var(--surface);color:var(--ink);text-decoration:none}
+.seg{display:flex;border:var(--rule) solid var(--ink)}
+.seg button{min-height:44px;padding:0 14px;border:none;background:var(--surface);display:flex;align-items:center;justify-content:center;gap:6px;font-weight:700;font-size:14px}
+.seg button+button{border-left:var(--rule) solid var(--ink)}
+.seg button[aria-pressed="true"],.seg button[aria-selected="true"]{background:var(--ink);color:var(--on-ink)}
+.toolbar{padding:12px 20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.toolbar .push{margin-left:auto}
+.chip{min-height:44px;padding:0 12px;border:var(--rule) solid var(--ink);background:var(--surface);font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+.chip[aria-pressed="true"],.chip[aria-checked="true"]{background:var(--ink);color:var(--on-ink)}
+.field{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700}
+.input{height:48px;width:100%;padding:0 12px;border:var(--rule) solid var(--ink);background:var(--surface);color:var(--ink);font:600 16px var(--sans);border-radius:0;-webkit-appearance:none;appearance:none}
+.input.mono{font:700 18px var(--mono)}
+.input[aria-invalid="true"]{border-width:4px}
+select.input{background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 18px) 21px,calc(100% - 12px) 21px;background-size:6px 6px;background-repeat:no-repeat;padding-right:32px}
+
+/* ── Notices (always in the layout, never over it) ── */
+.notice{position:relative;display:flex;align-items:center;gap:12px;padding:12px 12px 14px 20px;background:var(--ink);color:var(--on-ink);border-bottom:var(--rule) solid var(--ink)}
+.notice-body{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.notice-title{font-size:16px;font-weight:800}
+.notice-sub{font-size:13px}
+.notice .btn-outline{min-height:44px;padding:0 14px;border:2px solid var(--on-ink);background:transparent;color:var(--on-ink);font:800 15px var(--sans);flex-shrink:0}
+.notice-timer{position:absolute;left:0;bottom:0;height:4px;background:var(--shell);width:100%;transform-origin:left;animation:drain 8s linear forwards}
+@keyframes drain{to{transform:scaleX(0)}}
+
+/* ── Covers + stickers ── */
+.cover{position:relative;aspect-ratio:1;background:var(--ground);overflow:hidden}
+.cover img{width:100%;height:100%;object-fit:cover}
+.cover-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#2A2724}
+.cover-ph::before{content:'';width:62%;aspect-ratio:1;border-radius:50%;background:#121212;box-shadow:0 0 0 1px rgba(255,255,255,.08) inset}
+.cover-ph::after{content:'';position:absolute;width:20%;aspect-ratio:1;border-radius:50%;background:var(--ph,#B85A3A)}
+.sticker{position:absolute;right:8px;bottom:8px;width:56px;height:56px;border-radius:50%;border:2px solid var(--ink);background:var(--sticker);color:var(--on-sticker);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:800;transform:rotate(var(--rot,-8deg))}
+.sticker.lg{width:72px;height:72px;font-size:18px}
+.tag-new{position:absolute;left:10px;top:10px;padding:4px 8px;background:var(--ink);color:var(--on-ink);font-size:12px;font-weight:800}
+
+/* ── Grid + list ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(170px,45%),1fr));border-top:var(--rule) solid var(--ink);gap:0}
+.tile{display:flex;flex-direction:column;text-decoration:none;color:var(--ink);border-right:var(--rule) solid var(--ink);border-bottom:var(--rule) solid var(--ink);background:var(--surface);min-width:0;position:relative}
+.tile .cover{border-bottom:var(--rule) solid var(--ink)}
+.tile-cap{padding:10px 12px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.t-title{font-size:16px;font-weight:800;letter-spacing:-.3px;line-height:1.15;overflow-wrap:anywhere}
+.t-sub{font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile.is-new::after,.row.is-new::after{content:'';position:absolute;inset:0;border:4px solid var(--shell);pointer-events:none;z-index:2}
+.rows{list-style:none;border-top:var(--rule) solid var(--ink);background:var(--surface)}
+.row{display:grid;grid-template-columns:64px minmax(0,1fr) auto;border-bottom:var(--rule) solid var(--ink);align-items:stretch}
+.row .cover{width:64px;height:64px;border-right:var(--rule) solid var(--ink)}
+.row-main{padding:8px 12px;display:flex;flex-direction:column;justify-content:center;gap:2px;min-width:0;text-decoration:none;color:inherit}
+.row-main .t-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-side{padding:0 12px;border-left:var(--rule) solid var(--ink);display:flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:700;font-size:15px}
+.row{position:relative}
+.group-head{display:flex;justify-content:space-between;align-items:baseline;padding:10px 20px;background:var(--ink);color:var(--on-ink);font-weight:800;font-size:14px}
+.group-head .mono{font-size:13px}
+.empty{padding:40px 20px;display:flex;flex-direction:column;gap:12px}
+
+/* ── Dock + tab bar ── */
+.dock{position:fixed;left:0;right:0;bottom:var(--tabbar-h);z-index:30;padding:10px 16px;background:var(--ground);border-top:var(--rule) solid var(--ink);display:flex;gap:10px;align-items:center}
+.dock .search{flex:1;position:relative}
+.dock .search svg{position:absolute;left:14px;top:16px;pointer-events:none}
+.dock .search input{height:52px;padding-left:44px}
+.check-btn{width:56px;height:56px;flex-shrink:0;border-radius:28px;border:var(--rule) solid var(--ink);background:var(--shell);color:var(--on-shell);box-shadow:3px 3px 0 var(--ink);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:17px;font-weight:800;letter-spacing:-1px;text-decoration:none}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;height:var(--tabbar-h);padding-bottom:var(--bottom);background:var(--ground);border-top:var(--rule) solid var(--ink);display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.tabbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;font-size:12px;font-weight:600;border-right:var(--rule) solid var(--ink)}
+.tabbar a:last-child{border-right:none}
+.rail-mark{display:none}
+.tabbar a[aria-current="page"]{background:var(--shell);color:var(--on-shell);font-weight:800}
+
+/* ── Full-screen overlays (record, check, scan) ── */
+.screen{position:fixed;inset:0;z-index:50;background:var(--ground);overflow-y:auto;overscroll-behavior:contain}
+.screen-actions{position:sticky;bottom:0;z-index:5;padding:12px 16px calc(12px + var(--bottom));background:var(--ground);border-top:var(--rule) solid var(--ink);display:flex;flex-direction:column;gap:10px}
+.screen-actions .row-btns{display:flex;gap:10px}
+.screen-actions .row-btns>*{flex:1}
+.screen-body{padding-bottom:24px}
+
+/* Record */
+.rec-head{color:var(--paper-text);padding:calc(var(--top) + 20px) 20px 20px;border-bottom:var(--rule) solid var(--ink);display:flex;flex-direction:column;gap:12px}
+.back{align-self:flex-start;min-height:44px;padding:0 12px;display:flex;align-items:center;gap:4px;background:var(--surface);color:var(--ink);border:var(--rule) solid var(--ink);font-weight:700;font-size:14px;text-decoration:none}
+.rec-cover{position:relative;width:180px;height:180px;margin:6px 0 4px}
+.rec-cover .cover{position:absolute;inset:0;border:var(--rule) solid var(--ink);box-shadow:var(--shadow-lg);overflow:visible}
+.rec-cover .sticker{right:-24px;top:-16px;bottom:auto}
+.rec-title{font-size:46px;font-weight:900;font-stretch:72%;letter-spacing:-1.4px;line-height:.95;overflow-wrap:anywhere}
+.rec-artist{font-size:18px;font-weight:700}
+.rec-meta{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;flex-wrap:wrap}
+.label-dot{width:14px;height:14px;border-radius:50%;background:var(--paper-text);border:4px solid var(--ink)}
+.cells{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-bottom:var(--rule) solid var(--ink);background:var(--surface)}
+.cell{padding:10px 12px 10px 20px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.cell+.cell{border-left:var(--rule) solid var(--ink);padding-left:12px}
+.cell-label{font-size:13px;font-weight:600;color:var(--muted)}
+.cell-val{font-family:var(--mono);font-size:18px;font-weight:700;overflow-wrap:anywhere}
+.tracks{border-top:var(--rule) solid var(--ink);background:var(--surface)}
+.side-head{padding:10px 20px;font-size:14px;font-weight:800;background:var(--ink);color:var(--on-ink)}
+.track{display:grid;grid-template-columns:52px minmax(0,1fr) 72px;align-items:center;min-height:48px;border-bottom:var(--row-rule) solid var(--ink)}
+.track .pos{padding-left:20px;font-family:var(--mono);font-size:13px;font-weight:700}
+.track .nm{font-size:15px;font-weight:600;padding:8px 0}
+.track .dur{padding-right:20px;text-align:right;font-family:var(--mono);font-size:13px}
+.muted-note{padding:16px 20px;font-size:14px;color:var(--muted)}
+
+/* Price check */
+.check-form{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:10px}
+.with-btn{display:flex}
+.with-btn .input{border-right:none}
+.with-btn .icon-btn{width:48px;height:48px;background:var(--ink);color:var(--surface)}
+.match{min-height:52px;padding:0 10px 0 4px;border:var(--rule) solid var(--ink);background:var(--surface);display:flex;align-items:center;gap:10px;text-align:left;font-size:14px;font-weight:600;width:100%}
+.match .thumb{width:38px;height:38px;flex-shrink:0;border:1.5px solid var(--ink);overflow:hidden;background:#2A2724}
+.match .thumb img{width:100%;height:100%;object-fit:cover}
+.strip{padding:14px 20px;display:flex;align-items:center;gap:12px;background:var(--surface);color:var(--ink);border-bottom:var(--rule) solid var(--ink)}
+.strip.owned{background:var(--shell);color:var(--on-shell)}
+.strip-title{font-size:20px;font-weight:900;font-stretch:80%}
+.strip-sub{font-size:13px;font-weight:600}
+.verdict{margin:18px 20px 0;border:var(--rule) solid var(--ink);background:var(--surface);box-shadow:var(--shadow-lg);position:relative}
+.verdict-head{padding:10px 14px;border-bottom:var(--rule) solid var(--ink);font-family:var(--mono);font-size:12px;color:var(--muted)}
+.verdict-body{padding:16px 14px;display:flex;flex-direction:column;gap:14px}
+.verdict-word{font-size:44px;font-weight:900;font-stretch:72%;letter-spacing:-1.2px;line-height:1}
+.verdict .sticker{right:-12px;top:30px;bottom:auto;--rot:10deg}
+.rail{position:relative;height:56px}
+.rail-line{position:absolute;left:0;right:0;top:37px;height:4px;background:var(--ink)}
+.rail-tick{position:absolute;top:28px;width:4px;height:22px;background:var(--ink);transform:translateX(-2px)}
+.rail-dot{position:absolute;top:25px;width:28px;height:28px;border-radius:50%;border:2px solid var(--ink);background:var(--sticker);transform:translateX(-14px)}
+.rail-you{position:absolute;top:0;width:60px;transform:translateX(-30px);text-align:center;font-family:var(--mono);font-size:12px;font-weight:800}
+.rail-legend{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.rail-legend b{color:var(--ink)}
+.prose{font-size:15px;line-height:1.5}
+.skel{background:var(--ground)}
+.dashed{border-style:dashed!important}
+.error-card{margin:20px 20px 0;background:var(--ink);color:var(--on-ink);border:var(--rule) solid var(--ink);box-shadow:6px 6px 0 var(--shell);padding:18px 16px;display:flex;flex-direction:column;gap:10px}
+.error-title{font-size:30px;font-weight:900;font-stretch:72%;letter-spacing:-.8px;line-height:1}
+.warn{background:var(--ink);color:var(--on-ink);padding:12px 12px 12px 14px;display:flex;align-items:center;gap:12px}
+.warn .btn{min-height:44px;font-size:14px;padding:0 12px;border-color:var(--surface);flex-shrink:0}
+
+/* Scan */
+.viewfinder{position:relative;height:min(60vh,470px);background:#2A2724;overflow:hidden}
+.viewfinder video{width:100%;height:100%;object-fit:cover}
+.frame{position:absolute;left:50%;top:50%;width:270px;height:140px;transform:translate(-50%,-50%)}
+.frame span{position:absolute;width:34px;height:34px;border:0 solid var(--surface)}
+.frame .a{left:0;top:0;border-left-width:6px;border-top-width:6px}.frame .b{right:0;top:0;border-right-width:6px;border-top-width:6px}
+.frame .c{left:0;bottom:0;border-left-width:6px;border-bottom-width:6px}.frame .d{right:0;bottom:0;border-right-width:6px;border-bottom-width:6px}
+.frame .line{left:14px;right:14px;top:68px;height:3px;width:auto;background:var(--surface);border:none}
+.scan-caption{position:absolute;left:20px;right:20px;bottom:20px;padding:10px 12px;background:var(--ink);color:#fff;font-size:15px;font-weight:700;text-align:center}
+
+/* Play */
+.deck{margin:22px 20px 0;position:relative;aspect-ratio:1.06;max-width:420px;border:var(--rule) solid var(--ink);background:var(--surface);box-shadow:var(--shadow-lg)}
+.platter{position:absolute;left:4%;top:5%;width:80%;aspect-ratio:1;border-radius:50%;background:repeating-radial-gradient(circle,#0B0A09 0 9px,#1b1a18 9px 10px);}
+.platter.spin{animation:spin 1.6s cubic-bezier(.16,1,.3,1)}
+@keyframes spin{from{transform:rotate(-540deg)}to{transform:rotate(0)}}
+.platter .lbl{position:absolute;left:31%;top:31%;width:38%;height:38%;border-radius:50%;overflow:hidden;background:#B85A3A}
+.platter .lbl img{width:100%;height:100%;object-fit:cover}
+.platter .spindle{position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px;border-radius:50%;background:#D9D4CA}
+.arm-pivot{position:absolute;right:5%;top:5%;width:30px;height:30px;border-radius:50%;background:var(--ink)}
+.arm{position:absolute;right:calc(5% + 12px);top:calc(5% + 12px);width:7px;height:58%;background:var(--ink);transform-origin:top center;transform:rotate(22deg)}
+.rpm{position:absolute;right:10px;bottom:10px;width:58px;height:58px;border-radius:50%;border:2px solid var(--ink);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);font-family:var(--mono);font-size:13px;font-weight:800;line-height:1}
+.rpm small{font-size:11px;font-weight:600}
+.play-title{font-size:44px;font-weight:900;font-stretch:72%;letter-spacing:-1.2px;line-height:1;text-decoration:none;overflow-wrap:anywhere}
+.play-title svg{display:inline;vertical-align:-2px;margin-left:4px}
+
+/* Stats */
+.stat-sec{padding:20px 20px 0}
+.stat-h{font-size:22px;font-weight:900;font-stretch:80%;margin-bottom:10px}
+.stat-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:var(--rule) solid var(--ink);background:var(--surface)}
+.stat-card{padding:12px 14px;min-width:0;border-bottom:var(--rule) solid var(--ink)}
+.stat-card:nth-child(odd){border-right:var(--rule) solid var(--ink)}
+.stat-card:nth-last-child(-n+2){border-bottom:none}
+.stat-label{font-size:13px;font-weight:600;color:var(--muted)}
+.stat-val{font-family:var(--mono);font-size:22px;font-weight:700;letter-spacing:-.5px}
+.stat-sub{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bars{border:var(--rule) solid var(--ink);background:var(--surface);padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.bar-row{display:grid;grid-template-columns:minmax(0,9.5em) minmax(0,1fr) 3ch;gap:10px;align-items:center;font-size:14px;font-weight:600}
+.bar-row .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{height:14px;border:1.5px solid var(--ink);background:var(--ground)}
+.bar-fill{height:100%;background:var(--ink)}
+.bar-row .n{font-family:var(--mono);font-size:13px;text-align:right}
+
+/* Sheets (dialogs) */
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(18,18,18,.55)}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;max-height:88vh;overflow-y:auto;background:var(--ground);border-top:var(--rule) solid var(--ink);padding:18px 20px calc(20px + var(--bottom));display:flex;flex-direction:column;gap:14px}
+.sheet-title{font-size:28px;font-weight:900;font-stretch:72%;letter-spacing:-.8px;line-height:1}
+.sheet-sub{font-size:14px;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.danger{background:var(--ink);color:var(--on-ink)}
+
+@media (prefers-reduced-motion:reduce){
+  .platter.spin{animation:none}
+  .notice-timer{animation:none;display:none}
+  .btn-primary:active{transform:none}
+}
+@media (min-width:900px){
+  :root{--tabbar-h:0px}
+  .app{display:grid;grid-template-columns:220px minmax(0,1fr)}
+  .tabbar{position:sticky;top:0;height:100vh;height:100dvh;grid-template-columns:none;grid-auto-rows:72px;align-content:start;border-top:none;border-right:var(--rule) solid var(--ink);padding:calc(var(--top) + 12px) 0 0}
+  .tabbar a{flex-direction:row;justify-content:flex-start;gap:12px;padding:0 20px;font-size:15px;border-right:none;border-bottom:var(--rule) solid var(--ink)}
+  .dock{position:fixed;left:220px;right:auto;bottom:0;padding:12px 24px;width:min(760px,calc(100vw - 220px));border-right:var(--rule) solid var(--ink)}
+  .rail-mark{display:flex;align-items:flex-end;height:calc(var(--top) + 72px);margin-top:calc(-1 * (var(--top) + 12px));padding:0 20px 14px;background:var(--shell);border-bottom:var(--rule) solid var(--ink);font-size:30px;font-weight:900;font-stretch:72%;letter-spacing:-1px}
+  .view.has-dock{padding-bottom:110px}
+  .screen{left:220px}
+  .band,.toolbar{padding-left:32px;padding-right:32px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+  .sheet{left:auto;right:24px;bottom:24px;width:420px;border:var(--rule) solid var(--ink);box-shadow:var(--shadow-lg)}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="tabbar" aria-label="Main">
+    <span class="rail-mark" aria-hidden="true">Vinyl<span class="dot">.</span></span>
+    <a href="#/collection" data-tab="collection"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg>Collection</a>
+    <a href="#/wishlist" data-tab="wishlist"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Wishlist</a>
+    <a href="#/play" data-tab="play"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/></svg>Play</a>
+    <a href="#/stats" data-tab="stats"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Stats</a>
+  </nav>
+  <main id="main"></main>
+</div>
+
+<div class="dock" id="dock" hidden>
+  <label class="search">
+    <span class="sr-only" id="search-label">Search your collection</span>
+    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input class="input" id="search" type="search" autocomplete="off" placeholder="Do I own this?" aria-labelledby="search-label">
+  </label>
+  <a class="check-btn" href="#/check" aria-label="Check a price or add a record"><span aria-hidden="true">£?</span></a>
+</div>
+
+<div id="overlay"></div>
+<div id="dialogs"></div>
+<div class="sr-only" aria-live="polite" id="live"></div>
+<input type="file" id="csv-input" accept=".csv,text/csv" hidden>
+
+<script>
+'use strict';
+// ── Escaping: every external string goes through these before it reaches innerHTML ──
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeUrl=u=>/^\s*(javascript|vbscript):/i.test(String(u??''))?'':esc(u);
+const $=s=>document.querySelector(s);
+const money=n=>'£'+Math.round(Number(n)||0).toLocaleString('en-GB');
+const keyOf=(a,t)=>a+'|'+t;
+const same=(r,a,t)=>r.artist.toLowerCase()===String(a).toLowerCase()&&r.title.toLowerCase()===String(t).toLowerCase();
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch{return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}};
+function announce(msg){const l=$('#live');l.textContent='';setTimeout(()=>{l.textContent=msg;},30);}
+
+const ICON={
+  back:'<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M15 5l-7 7 7 7"/></svg>',
+  close:'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  grid:'<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>',
+  list:'<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M8 6h13M8 12h13M8 18h13M3 6h1M3 12h1M3 18h1"/></svg>',
+  sort:'<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 6h16M7 12h10M10 18h4"/></svg>',
+  scan:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 7V4h3M17 4h3v3M20 17v3h-3M7 20H4v-3M8 8v8M11 8v8M14 8v8M17 8v8"/></svg>',
+  torch:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 2h10v5l-3 4v11h-4V11L7 7z"/><path d="M7 7h10M12 14v3"/></svg>',
+  play:'<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>',
+  again:'<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>',
+  more:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
+  owned:'<svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="var(--shell)" stroke-width="2.6"/></svg>',
+  notOwned:'<svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="4" width="16" height="16"/><path d="M4 20 20 4"/></svg>',
+  wish:'<svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 3h12v18l-6-4-6 4z"/></svg>',
+  offline:'<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M2 8.5a15 15 0 0 1 20 0M5.5 12a10 10 0 0 1 13 0M9 15.5a5 5 0 0 1 6 0"/><path d="M3 3l18 18"/></svg>',
+  warn:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg>',
+};
+
+// ── State ─────────────────────────────────────────────────────
+let COLL=[], WISH=[];
+const ui={
+  view:'collection', mode:store.get('vinyl_view_mode','grid'),
+  csort:'val', wsort:'tier', genres:new Set(), wfilters:new Set(), q:'',
+  newKey:null, notice:null, offline:!navigator.onLine, source:'sheet', loaded:false,
+  playTab:'shelf', spin:null, rec:null, recLoading:false,
+};
+const GENRES=['Soul / Funk','Motown','Hip-Hop','Neo-Soul / Leftfield','R&B / Pop','Electronic','Rock / New Wave','Reggae','Jazz','Disco / Pop'];
+const TIERS=[['sh','Second-hand'],['store','Store'],['hmv','HMV 3-for'],['patience','Patience']];
+const TIER_LABEL=Object.fromEntries(TIERS);
+// Record-page header tint, by genre. All pass 4.5:1 with --paper-text.
+const TINT={'Soul / Funk':'#A44E30','Motown':'#7A5A12','Hip-Hop':'#8A3A22','Neo-Soul / Leftfield':'#6E2860','R&B / Pop':'#8E1F4A','Electronic':'#4A2C82','Rock / New Wave':'#5A4632','Reggae':'#3F5220','Jazz':'#1D5F73','Disco / Pop':'#7A3E66'};
+const tintOf=g=>TINT[g]||'#4B4740';
+
+// ── Caches ────────────────────────────────────────────────────
+const artCache=store.get('vinyl_art_v4',{});
+const yearCache=store.get('vinyl_year_v1',{});
+Object.keys(yearCache).forEach(k=>{if(parseInt(yearCache[k])>=2020)delete yearCache[k];});
+const ratingCache=store.get('vinyl_rating_v1',{});
+const trackCache=store.get('vinyl_track_cache',{});
+const priceCache=store.get('vinyl_price_v1',{});
+const saveCaches=()=>{store.set('vinyl_art_v4',artCache);store.set('vinyl_year_v1',yearCache);store.set('vinyl_rating_v1',ratingCache);store.set('vinyl_track_cache',trackCache);store.set('vinyl_price_v1',priceCache);};
+
+// ── Sheets: reads, writes and the retry queue ────────────────
+let pending=store.get('vinyl_pending_v1',[]);
+let lastSync=store.get('vinyl_last_sync',0);
+async function sheetsGet(){
+  const r=await fetch('/api/sheets',{signal:AbortSignal.timeout(12000)});
+  if(!r.ok) throw new Error(r.status);
+  return r.json();
+}
+async function postRaw(body){
+  const r=await fetch('/api/sheets',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!r.ok) throw new Error(r.status);
+  return r.json().catch(()=>({}));
+}
+// Writes never block the UI: a failed write is kept on this phone and retried.
+async function save(body){
+  if(pending.length){pending.push(body);store.set('vinyl_pending_v1',pending);flush();return;}
+  try{await postRaw(body);lastSync=Date.now();store.set('vinyl_last_sync',lastSync);}
+  catch{pending.push(body);store.set('vinyl_pending_v1',pending);render();}
+}
+let flushing=false;
+async function flush(){
+  if(flushing||!pending.length) return;
+  flushing=true;
+  while(pending.length){
+    try{await postRaw(pending[0]);pending.shift();store.set('vinyl_pending_v1',pending);}
+    catch{break;}
+  }
+  flushing=false;
+  if(!pending.length){lastSync=Date.now();store.set('vinyl_last_sync',lastSync);}
+  render();
+}
+
+// ── Load ──────────────────────────────────────────────────────
+const normC=r=>({artist:String(r.artist||''),title:r.title===0.999||r.title==='0.999'?'99.9%':String(r.title||''),year:String(r.year||''),value:Number(r.value)||0,genre:String(r.genre||''),releaseId:String(r.releaseId||''),image:String(r.image||''),tracklist:r.tracklist||''});
+const normW=r=>({artist:String(r.artist||''),title:r.title===0.999||r.title==='0.999'?'99.9%':String(r.title||''),year:String(r.year||''),price:Number(r.price)||0,tier:String(r.tier||'store'),spotify:r.spotify===true||r.spotify==='true'||r.spotify===1,genre:String(r.genre||''),hmvNote:String(r.hmvNote||'nothmv'),image:String(r.image||''),releaseId:String(r.releaseId||'')});
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+async function load(){
+  try{
+    const d=await sheetsGet();
+    COLL=(d.collection||[]).map(normC).filter(r=>r.artist);
+    WISH=(d.wishlist||[]).map(normW).filter(r=>r.artist);
+    ui.source='sheet';lastSync=Date.now();store.set('vinyl_last_sync',lastSync);
+    store.set('vinyl_data_v1',{at:Date.now(),c:COLL,w:WISH});
+  }catch{
+    const cached=store.get('vinyl_data_v1',null);
+    if(cached){COLL=cached.c.map(normC);WISH=cached.w.map(normW);ui.source='cache';ui.cacheAt=cached.at;}
+    else{
+      try{
+        await loadScript('/data.js');
+        COLL=(window.COLL_SEED||[]).map(r=>normC({artist:r[0],title:r[1],year:r[2],value:r[3],genre:r[4],releaseId:r[5]}));
+        WISH=(window.WISH_SEED||[]).map(r=>normW({artist:r[0],title:r[1],year:r[2],price:r[3],tier:r[4],spotify:r[5],genre:r[6],hmvNote:r[7]}));
+        ui.source='seed';
+      }catch{COLL=[];WISH=[];ui.source='none';}
+    }
+  }
+  ui.loaded=true;
+  snapshotValue();
+  render();
+  flush();
+}
+function persistLocal(){store.set('vinyl_data_v1',{at:Date.now(),c:COLL,w:WISH});}
+
+// Collection value history, kept on this phone so the header can show real change.
+function addedToday(){const t=new Date().toISOString().slice(0,10);return store.get('vinyl_added',[]).filter(a=>a.d===t&&COLL.some(r=>keyOf(r.artist,r.title)===a.k)).length;}
+function noteAdded(rec){const t=new Date().toISOString().slice(0,10);const a=store.get('vinyl_added',[]).filter(x=>x.d===t);a.push({d:t,k:keyOf(rec.artist,rec.title)});store.set('vinyl_added',a);}
+function totalValue(){return COLL.reduce((s,r)=>s+(Number(r.value)||0),0);}
+// Change is measured only on records that were in the oldest snapshot, so new purchases never count as value gained.
+function snapshotValue(){
+  if(!COLL.length) return;
+  const hist=store.get('vinyl_value_hist_v2',[]);
+  const today=new Date().toISOString().slice(0,10);
+  if(hist.length&&hist[hist.length-1].d===today) return;
+  hist.push({d:today,v:Object.fromEntries(COLL.map(r=>[keyOf(r.artist,r.title),r.value]))});
+  const cutoff=Date.now()-90*864e5;
+  store.set('vinyl_value_hist_v2',hist.filter(h=>new Date(h.d).getTime()>=cutoff));
+}
+function valueChange(){
+  const hist=store.get('vinyl_value_hist_v2',[]);
+  if(hist.length<2) return null;
+  const first=hist[0];
+  let diff=0;COLL.forEach(r=>{const k=keyOf(r.artist,r.title);if(k in first.v)diff+=(Number(r.value)||0)-(Number(first.v[k])||0);});
+  if(!diff) return null;
+  const d=new Date(first.d);
+  return {diff,since:d.getDate()+' '+d.toLocaleString('en-GB',{month:'short'})};
+}
+function agoText(ts){
+  if(!ts) return '';
+  const m=Math.round((Date.now()-ts)/60000);
+  if(m<1) return 'just now'; if(m<60) return m+' min ago';
+  const h=Math.round(m/60); if(h<24) return h+' h ago';
+  return new Date(ts).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+}
+
+// ── Artwork, years, ratings, tracklists ──────────────────────
+async function fetchArt(a,t,rid){
+  const k=keyOf(a,t);
+  if(k in artCache) return artCache[k];
+  try{
+    let u=`/api/artwork?artist=${encodeURIComponent(a)}&title=${encodeURIComponent(t)}`;
+    if(rid) u+=`&releaseId=${encodeURIComponent(rid)}`;
+    const r=await fetch(u,{signal:AbortSignal.timeout(8000)});
+    if(r.ok){const d=await r.json();artCache[k]=d.url||null;if(d.originalYear)fixYear(a,t,d.originalYear);saveCaches();return artCache[k];}
+  }catch{}
+  return null;
+}
+function fixYear(a,t,y){
+  yearCache[keyOf(a,t)]=y;
+  const rec=COLL.find(r=>r.artist===a&&r.title===t);
+  if(rec&&String(rec.year)!==String(y)){rec.year=String(y);save({action:'updateYear',artist:a,title:t,year:String(y)});}
+}
+// Covers load as they scroll into view, four at a time.
+const artQueue=[];let artActive=0;
+function pumpArt(){
+  while(artActive<4&&artQueue.length){
+    const el=artQueue.shift();artActive++;
+    fetchArt(el.dataset.a,el.dataset.t,el.dataset.rid).then(url=>{if(url)paintCover(el,url);}).finally(()=>{artActive--;pumpArt();});
+  }
+}
+const artObserver='IntersectionObserver' in window?new IntersectionObserver(es=>{
+  es.forEach(e=>{if(e.isIntersecting){artObserver.unobserve(e.target);artQueue.push(e.target);}});pumpArt();
+},{rootMargin:'300px'}):null;
+function paintCover(el,url){
+  if(!url||el.querySelector('img')) return;
+  const img=new Image();img.alt='';img.decoding='async';img.src=url;
+  img.onload=()=>{el.querySelector('.cover-ph')?.remove();el.prepend(img);};
+}
+function wireCovers(root){
+  root.querySelectorAll('.cover[data-a]').forEach(el=>{
+    if(el.querySelector('img')) return;
+    const k=keyOf(el.dataset.a,el.dataset.t);
+    if(artCache[k]) paintCover(el,artCache[k]);
+    else if(!(k in artCache)){if(artObserver)artObserver.observe(el);else{artQueue.push(el);pumpArt();}}
+  });
+}
+async function fetchRating(a,t){
+  const k=keyOf(a,t);
+  if(k in ratingCache) return ratingCache[k];
+  try{const r=await fetch(`/api/rating?artist=${encodeURIComponent(a)}&title=${encodeURIComponent(t)}`,{signal:AbortSignal.timeout(8000)});
+    if(r.ok){const d=await r.json();ratingCache[k]=d.rating?d:null;saveCaches();return ratingCache[k];}}catch{}
+  return null;
+}
+async function discogsSearch(params){
+  const r=await fetch('/api/search?'+new URLSearchParams(params).toString(),{signal:AbortSignal.timeout(12000)});
+  if(!r.ok) throw new Error(r.status);
+  const d=await r.json();
+  return (d.results||[]).map(x=>{
+    const parts=String(x.title||'').split(' - ');
+    return {artist:x.displayArtist||parts[0]||params.artist||'',title:x.displayTitle||(parts.length>1?parts.slice(1).join(' - '):x.title)||params.title||'',
+      year:x.year?String(x.year):'',label:x.label||'',catno:x.catno||'',country:x.country||'',price:Number(x.price)||0,image:x.image||'',
+      releaseId:x.id?String(x.id):'',genre:x.genre||'',tier:x.tier||'',hmvNote:x.hmvNote||''};
+  });
+}
+function priceStats(results){
+  const p=results.map(r=>r.price).filter(n=>n>0).sort((a,b)=>a-b);
+  if(!p.length) return null;
+  const mid=Math.floor(p.length/2);
+  const median=p.length%2?p[mid]:(p[mid-1]+p[mid])/2;
+  return {low:p[0],high:p[p.length-1],median:Math.round(median),count:p.length};
+}
+
+// ── Helpers for markup ───────────────────────────────────────
+const rot=i=>[-10,8,-4,12,-6,6][i%6];
+function coverHTML(r,{sticker,big}={}){
+  const k=keyOf(r.artist,r.title), url=r.image||artCache[k];
+  const img=url?`<img src="${safeUrl(url)}" alt="" loading="lazy" decoding="async">`:`<div class="cover-ph" style="--ph:${tintOf(r.genre)}"></div>`;
+  return `<div class="cover" data-a="${esc(r.artist)}" data-t="${esc(r.title)}" data-rid="${esc(r.releaseId||'')}">${img}${sticker!=null?`<span class="sticker${big?' lg':''}" style="--rot:${big?-10:sticker.rot}deg">${esc(sticker.text)}</span>`:''}</div>`;
+}
+function bandHTML(title,{value,meta,chg,right}={}){
+  return `<header class="band" id="band">
+    <div class="band-row"><h1 class="h1">${title}</h1>${value!=null?`<p class="band-value">${esc(value)}</p>`:''}${right||''}</div>
+    ${meta||chg?`<div class="band-row band-hide"><p class="band-meta">${meta||''}</p>${chg||''}</div>`:''}
+  </header>`;
+}
+function noticeHTML(){
+  const out=[];
+  if(ui.offline||ui.source==='cache') out.push(`<div class="notice" role="status">${ICON.offline}<div class="notice-body"><span class="notice-title">${navigator.onLine?'Couldn’t reach your Google Sheet':'You’re offline'}</span><span class="notice-sub">${ui.cacheAt?'Showing the copy saved on this phone on '+esc(new Date(ui.cacheAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'})):'Showing the copy saved on this phone'}</span></div></div>`);
+  else if(ui.source==='seed') out.push(`<div class="notice" role="status">${ICON.warn}<div class="notice-body"><span class="notice-title">Couldn't reach your Google Sheet</span><span class="notice-sub">Showing the starter list instead</span></div><button class="btn-outline" data-act="reload">Retry</button></div>`);
+  if(pending.length) out.push(`<div class="notice" role="alert">${ICON.warn}<div class="notice-body"><span class="notice-title">Not saved to Google Sheet</span><span class="notice-sub">${pending.length} change${pending.length>1?'s are':' is'} kept on this phone</span></div><button class="btn-outline" data-act="retry">Retry</button></div>`);
+  if(ui.notice){const n=ui.notice;out.push(`<div class="notice" role="status"><div class="notice-body"><span class="notice-title">${esc(n.title)}</span>${n.sub?`<span class="notice-sub">${esc(n.sub)}</span>`:''}</div>${n.undo?`<button class="btn-outline" data-act="undo">Undo <span class="mono" style="font-size:12px;font-weight:600" id="undo-s">${n.left}s</span></button><span class="notice-timer" aria-hidden="true"></span>`:''}</div>`);}
+  return out.join('');
+}
+let undoTimer=null;
+function showNotice(title,sub,undo){
+  clearInterval(undoTimer);
+  ui.notice={title,sub,undo,left:8};
+  announce(title+(sub?'. '+sub:''));
+  if(undo){
+    undoTimer=setInterval(()=>{
+      ui.notice.left--;
+      const s=$('#undo-s'); if(s) s.textContent=ui.notice.left+'s';
+      if(ui.notice.left<=0){clearInterval(undoTimer);ui.notice=null;render();}
+    },1000);
+  }else setTimeout(()=>{if(ui.notice&&ui.notice.title===title){ui.notice=null;render();}},5000);
+}
+
+// ── Routing ───────────────────────────────────────────────────
+function route(){
+  const h=location.hash.replace(/^#\/?/,'')||'collection';
+  const [name,arg]=h.split('/');
+  closeScreen(true);
+  if(['collection','wishlist','play','stats'].includes(name)){ui.view=name;render();if(!ui.newKey)window.scrollTo(0,0);}
+  else if(name==='record') openRecord(decodeURIComponent(arg||''));
+  else if(name==='check') openCheck();
+  else if(name==='scan') openScan();
+  else {ui.view='collection';render();}
+}
+window.addEventListener('hashchange',route);
+
+// ── Render: main views ───────────────────────────────────────
+function render(){
+  if(!ui.loaded){$('#main').innerHTML=`<div class="view">${bandHTML('Vinyl<span class="dot">.</span>')}<p class="muted-note">Loading your collection…</p></div>`;return;}
+  document.querySelectorAll('.tabbar a').forEach(a=>{if(a.dataset.tab===ui.view)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  const dock=$('#dock');
+  const showDock=ui.view==='collection'||ui.view==='wishlist';
+  dock.hidden=!showDock||(ui.view==='collection'&&!COLL.length);
+  $('#search-label').textContent=ui.view==='wishlist'?'Search your wishlist':'Search your collection';
+  $('#search').placeholder=ui.view==='wishlist'?'Search your wishlist':'Do I own this?';
+  const html={collection:viewCollection,wishlist:viewWishlist,play:viewPlay,stats:viewStats}[ui.view]();
+  $('#main').innerHTML=html;
+  wireCovers($('#main'));
+  if(ui.view==='play'&&ui.playTab==='new'&&!ui.rec&&!ui.recLoading) loadRec();
+}
+
+function sortColl(list){
+  const by={val:(a,b)=>b.value-a.value,az:(a,b)=>a.artist.replace(/^The /,'').localeCompare(b.artist.replace(/^The /,'')),yr:(a,b)=>(parseInt(a.year)||9999)-(parseInt(b.year)||9999)}[ui.csort];
+  return [...list].sort(by);
+}
+const SORT_LABEL={val:'Value',az:'A–Z',yr:'Year'};
+function matchesQ(r){const q=ui.q.toLowerCase().trim();return !q||(r.artist+' '+r.title+' '+r.genre+' '+(r.releaseId||'')).toLowerCase().includes(q);}
+
+function viewCollection(){
+  const total=totalValue(), chg=valueChange();
+  const band=bandHTML('Vinyl<span class="dot">.</span>',{value:COLL.length?money(total):null,
+    meta:`${COLL.length} record${COLL.length===1?'':'s'}${addedToday()?` · <span class="mono">+${addedToday()}</span> today`:''}${lastSync?` · synced ${esc(agoText(lastSync))}`:''}`,
+    chg:chg?`<span class="chg">${chg.diff>0?'+':'−'}${money(Math.abs(chg.diff))} since ${esc(chg.since)}</span>`:''});
+  if(!COLL.length) return `<section class="view"><div class="top">${band}${noticeHTML()}</div>${firstRunHTML()}</section>`;
+  const list=sortColl(COLL.filter(r=>matchesQ(r)&&(!ui.genres.size||ui.genres.has(r.genre))));
+  const filterCount=ui.genres.size;
+  const toolbar=`<div class="toolbar">
+    <div class="seg" role="group" aria-label="View">
+      <button aria-pressed="${ui.mode==='grid'}" data-act="mode" data-v="grid">${ICON.grid}Grid</button>
+      <button aria-pressed="${ui.mode==='list'}" data-act="mode" data-v="list">${ICON.list}List</button>
+    </div>
+    <button class="chip push" data-act="sortsheet">${ICON.sort}Sort: ${SORT_LABEL[ui.csort]}${filterCount?` · ${filterCount} genre${filterCount>1?'s':''}`:''}</button>
+  </div>`;
+  let body;
+  if(!list.length){
+    body=ui.q?`<div class="strip">${ICON.notOwned}<span style="display:flex;flex-direction:column;gap:2px"><span class="strip-title">Not in your collection</span><span class="strip-sub">Nothing matches “${esc(ui.q)}”</span></span></div>
+      <div class="empty"><a class="btn btn-primary" href="#/check" data-act="checkq">Check a price for it</a></div>`
+      :`<div class="empty"><p class="prose">No records match these genres.</p><button class="btn" data-act="cleargenres">Show all genres</button></div>`;
+  } else if(ui.mode==='grid'){
+    body=`<div class="grid">${list.map((r,i)=>{const k=keyOf(r.artist,r.title);return `<a class="tile${ui.newKey===k?' is-new':''}" href="#/record/${encodeURIComponent('c:'+k)}" ${ui.newKey===k?'id="new-tile"':''}>
+      ${coverHTML(r,{sticker:{text:money(r.value),rot:rot(i)}})}${ui.newKey===k?'<span class="tag-new">Just added</span>':''}
+      <span class="tile-cap"><span class="t-title">${esc(r.title)}</span><span class="t-sub">${esc(r.artist)}${r.year?' · '+esc(r.year):''}</span></span></a>`;}).join('')}</div>`;
+  } else {
+    body=`<ul class="rows">${list.map(r=>{const k=keyOf(r.artist,r.title);return `<li class="row${ui.newKey===k?' is-new':''}" ${ui.newKey===k?'id="new-tile"':''}>${coverHTML(r)}
+      <a class="row-main" href="#/record/${encodeURIComponent('c:'+k)}"><span class="t-title">${esc(r.title)}</span><span class="t-sub">${esc(r.artist)}${r.year?' · <span class="mono">'+esc(r.year)+'</span>':''}</span></a>
+      <span class="row-side">${money(r.value)}</span></li>`;}).join('')}</ul>`;
+  }
+  return `<section class="view has-dock"><div class="top">${band}${noticeHTML()}</div>${toolbar}${body}</section>`;
+}
+function firstRunHTML(){
+  return `<div class="empty" style="padding-top:30px">
+    <h2 class="rec-title" style="font-size:44px">Start your collection</h2>
+    <p class="prose" style="color:var(--muted)">Bring in everything from Discogs at once, or add records as you go. Prices fill in automatically.</p>
+    <button class="btn btn-primary" data-act="import">Import from Discogs</button>
+    <div style="display:flex;gap:10px"><a class="btn" style="flex:1" href="#/scan">Scan a barcode</a><a class="btn" style="flex:1" href="#/check">Search to add</a></div>
+    <p class="prose" style="font-size:14px"><strong>Where's my Discogs file?</strong> On discogs.com go to Collection, then Export, and download the CSV.</p>
+  </div>`;
+}
+
+function viewWishlist(){
+  const total=WISH.reduce((s,r)=>s+(Number(r.price)||0),0);
+  const band=bandHTML('Wishlist',{value:money(total),meta:`${WISH.length} record${WISH.length===1?'':'s'} to find`});
+  const toolbar=`<div class="toolbar">
+    <button class="chip" aria-pressed="${ui.wfilters.has('hmv')}" data-act="wfilter" data-v="hmv">HMV 3-for deals</button>
+    <button class="chip" aria-pressed="${ui.wfilters.has('sp')}" data-act="wfilter" data-v="sp">On Spotify</button>
+  </div>`;
+  if(!WISH.length) return `<section class="view has-dock"><div class="top">${band}${noticeHTML()}</div><div class="empty"><p class="prose">Nothing on your wishlist yet. Price-check a record in a shop and tap “Add to wishlist”, or get a suggestion from Play.</p><a class="btn btn-primary" href="#/check">Check a price</a></div></section>`;
+  const list=WISH.filter(r=>matchesQ(r)&&(!ui.wfilters.has('hmv')||r.hmvNote==='deal')&&(!ui.wfilters.has('sp')||r.spotify));
+  const groups=TIERS.map(([t,l])=>[t,l,list.filter(r=>r.tier===t).sort((a,b)=>a.price-b.price)]).filter(g=>g[2].length);
+  const body=groups.length?groups.map(([t,l,items])=>`<h2 class="group-head"><span>${esc(l)}</span><span class="mono">${items.length} · ${money(items.reduce((s,r)=>s+r.price,0))}</span></h2>
+    <ul class="rows" style="border-top:none">${items.map(r=>{const k=keyOf(r.artist,r.title);return `<li class="row">${coverHTML(r)}
+      <a class="row-main" href="#/record/${encodeURIComponent('w:'+k)}"><span class="t-title">${esc(r.title)}</span><span class="t-sub">${esc(r.artist)}${r.hmvNote==='deal'?' · HMV 3-for':''}${r.spotify?' · Spotify':''}</span></a>
+      <span class="row-side">${money(r.price)}<button class="btn" style="min-height:44px;font-size:14px;padding:0 10px" data-act="bought" data-k="${esc(k)}">Bought</button></span></li>`;}).join('')}</ul>`).join('')
+    :`<div class="empty"><p class="prose">Nothing on your wishlist matches.</p></div>`;
+  return `<section class="view has-dock"><div class="top">${band}${noticeHTML()}</div>${toolbar}${body}</section>`;
+}
+
+function viewPlay(){
+  const band=`<header class="band"><h1 class="h1">What to play</h1>
+    <div class="seg" role="tablist" aria-label="Pick from" style="display:grid;grid-template-columns:1fr 1fr">
+      <button role="tab" aria-selected="${ui.playTab==='shelf'}" data-act="playtab" data-v="shelf">From your shelf</button>
+      <button role="tab" aria-selected="${ui.playTab==='new'}" data-act="playtab" data-v="new">Something new</button>
+    </div></header>`;
+  if(ui.playTab==='shelf'){
+    if(!COLL.length) return `<section class="view">${band}<div class="empty"><p class="prose">Add some records first, then Spin picks one from your shelf.</p></div></section>`;
+    if(!ui.spin||!COLL.some(r=>same(r,ui.spin.artist,ui.spin.title))) ui.spin=COLL[Math.floor(Math.random()*COLL.length)];
+    const r=ui.spin, url=r.image||artCache[keyOf(r.artist,r.title)];
+    return `<section class="view">${band}
+      <div class="deck" aria-hidden="true"><div class="platter${ui.spun?' spin':''}"><div class="lbl" style="background:${tintOf(r.genre)}">${url?`<img src="${safeUrl(url)}" alt="">`:''}</div><div class="spindle"></div></div><div class="arm-pivot"></div><div class="arm"></div><span class="rpm">33<small>rpm</small></span></div>
+      <div style="padding:22px 20px 0;display:flex;flex-direction:column;gap:4px">
+        <a class="play-title" href="#/record/${encodeURIComponent('c:'+keyOf(r.artist,r.title))}">${esc(r.title)}&nbsp;<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><path d="M9 5l7 7-7 7"/></svg></a>
+        <p style="font-size:16px;font-weight:600;color:var(--muted)">${esc(r.artist)}${r.year?' · '+esc(r.year):''}${r.genre?' · '+esc(r.genre):''}</p>
+      </div>
+      <div style="padding:16px 20px 0;display:grid;grid-template-columns:1.3fr 1fr;gap:10px">
+        <a class="btn btn-primary" target="_blank" rel="noopener" href="${esc(spotifyUrl(r))}">${ICON.play}Play on Spotify</a>
+        <button class="btn" data-act="spin">${ICON.again}Spin again</button>
+      </div></section>`;
+  }
+  let body;
+  if(ui.recLoading) body=`<div class="verdict dashed" aria-busy="true"><div class="verdict-head">Finding something for you…</div><div class="verdict-body"><span class="skel" style="height:40px;width:70%"></span><span class="skel" style="height:14px"></span><span class="skel" style="height:14px;width:80%"></span></div></div>`;
+  else if(ui.rec&&ui.rec.error) body=`<div class="error-card" role="alert"><p class="error-title">Couldn't get a suggestion</p><p class="prose">The recommendation service didn't answer. Try again in a moment.</p><button class="btn" data-act="recagain">Try again</button></div>`;
+  else if(ui.rec){
+    const r=ui.rec;
+    body=`<div class="verdict"><div class="verdict-head">Suggested for your collection</div>
+      <div class="verdict-body" style="flex-direction:row;gap:14px;align-items:flex-start">
+        <div style="width:110px;flex-shrink:0;border:var(--rule) solid var(--ink)">${coverHTML({artist:r.artist,title:r.title,genre:r.genre,image:r.image||''})}</div>
+        <div style="display:flex;flex-direction:column;gap:4px;min-width:0"><p class="t-title" style="font-size:22px">${esc(r.title)}</p><p class="t-sub" style="white-space:normal">${esc(r.artist)}${r.year?' · '+esc(r.year):''}</p>${r.price?`<p class="mono" style="font-weight:700">~${money(r.price)} on Discogs</p>`:''}</div>
+      </div>
+      <p class="prose" style="padding:0 14px 16px">${esc(r.reason)}</p></div>
+      <div style="padding:22px 20px 0;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:10px"><button class="btn btn-primary" style="flex:1" data-act="recadd">Add to wishlist</button><button class="btn" style="flex:1" data-act="recskip">Not for me</button></div>
+        <a class="btn-text" style="align-self:center" target="_blank" rel="noopener" href="${esc(spotifyUrl(r))}">Listen on Spotify</a>
+      </div>`;
+  } else body='';
+  return `<section class="view">${band}${body}</section>`;
+}
+const spotifyUrl=r=>`https://open.spotify.com/search/${encodeURIComponent(r.artist+' '+r.title)}`;
+
+function viewStats(){
+  const band=bandHTML('Stats',{meta:lastSync?`Synced ${esc(agoText(lastSync))}`:''});
+  const tools=`<div class="stat-sec"><h2 class="stat-h">Your data</h2><div style="display:flex;flex-direction:column;gap:10px">
+    <button class="btn" data-act="import">Import from Discogs CSV</button>
+    <p class="prose" style="font-size:14px;color:var(--muted)">Your collection lives in your Google Sheet. Importing compares the Discogs export with it and shows every change before anything is saved.</p></div></div>`;
+  const coll=COLL.filter(r=>!/^various/i.test(r.artist));
+  if(!coll.length) return `<section class="view"><div class="top">${band}${noticeHTML()}</div><p class="muted-note">Stats appear once you have records.</p>${tools}</section>`;
+  const total=coll.reduce((s,r)=>s+r.value,0);
+  const byVal=[...coll].sort((a,b)=>b.value-a.value);
+  const yrs=coll.filter(r=>parseInt(r.year)>1900).sort((a,b)=>parseInt(a.year)-parseInt(b.year));
+  const count=(arr,f)=>{const m={};arr.forEach(r=>{const k=f(r);if(k)m[k]=(m[k]||0)+1;});return Object.entries(m);};
+  const genres=count(coll,r=>r.genre||'Unknown').sort((a,b)=>b[1]-a[1]);
+  const decades=count(coll,r=>{const y=parseInt(r.year);return y?Math.floor(y/10)*10+'s':'';}).sort((a,b)=>a[0].localeCompare(b[0]));
+  const artists=count(coll,r=>r.artist).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const bars=(rows)=>{const max=Math.max(...rows.map(r=>r[1]),1);return `<div class="bars">${rows.map(([l,n])=>`<div class="bar-row"><span class="lbl">${esc(l)}</span><span class="bar-track"><span class="bar-fill" style="display:block;width:${Math.round(n/max*100)}%"></span></span><span class="n">${n}</span></div>`).join('')}</div>`;};
+  const card=(l,v,s)=>`<div class="stat-card"><p class="stat-label">${l}</p><p class="stat-val">${esc(v)}</p><p class="stat-sub">${esc(s||'')}</p></div>`;
+  const hmv=WISH.filter(r=>r.hmvNote==='deal'||r.tier==='hmv').length;
+  return `<section class="view"><div class="top">${band}${noticeHTML()}</div>
+    <div class="stat-sec"><h2 class="stat-h">Collection</h2><div class="stat-cards">
+      ${card('Total value',money(total),coll.length+' records')}${card('Average',money(total/coll.length),'per record')}
+      ${card('Most valuable',money(byVal[0].value),byVal[0].title)}${card('Oldest',yrs[0]?.year||'—',yrs[0]?.title)}
+    </div></div>
+    <div class="stat-sec"><h2 class="stat-h">By genre</h2>${bars(genres)}</div>
+    <div class="stat-sec"><h2 class="stat-h">By decade</h2>${bars(decades)}</div>
+    <div class="stat-sec"><h2 class="stat-h">Most collected artists</h2>${bars(artists)}</div>
+    <div class="stat-sec"><h2 class="stat-h">Wishlist</h2><div class="stat-cards">
+      ${card('To spend',money(WISH.reduce((s,r)=>s+r.price,0)),WISH.length+' records')}${card('HMV 3-for',String(hmv),hmv?'qualify for the deal':'none right now')}
+    </div></div>
+    ${tools}</section>`;
+}
+
+// ── Record screen ────────────────────────────────────────────
+let recCtx=null;
+function findByKey(id){
+  const list=id.startsWith('w:')?'w':'c', k=id.slice(2);
+  const arr=list==='w'?WISH:COLL;
+  const r=arr.find(x=>keyOf(x.artist,x.title)===k);
+  return r?{list,r}:null;
+}
+function openRecord(id){
+  const hit=findByKey(id);
+  if(!hit){location.replace('#/collection');return;}
+  recCtx={...hit,id};
+  renderRecord();
+  const {r}=hit;
+  loadTracks(r);
+  fetchRating(r.artist,r.title).then(()=>recCtx&&recCtx.r===r&&renderRecord(true));
+  const pk='q:'+keyOf(r.artist,r.title).toLowerCase();
+  if(!priceCache[pk]&&navigator.onLine) discogsSearch({artist:r.artist,title:r.title}).then(res=>{priceCache[pk]={at:Date.now(),stats:priceStats(res)};saveCaches();if(recCtx&&recCtx.r===r)renderRecord(true);}).catch(()=>{});
+  if(!r.image&&!artCache[keyOf(r.artist,r.title)]) fetchArt(r.artist,r.title,r.releaseId).then(u=>{if(u&&recCtx&&recCtx.r===r)renderRecord(true);});
+}
+function renderRecord(keepScroll){
+  if(!recCtx) return;
+  const {r,list}=recCtx, k=keyOf(r.artist,r.title);
+  const rating=ratingCache[k], ps=priceCache['q:'+k.toLowerCase()]?.stats;
+  const val=list==='c'?r.value:ps?.median;
+  const tracks=recCtx.tracks;
+  const prev=$('#screen')?.scrollTop||0;
+  $('#overlay').innerHTML=`<section class="screen" id="screen" role="dialog" aria-modal="true" aria-label="${esc(r.title)} by ${esc(r.artist)}">
+    <header class="rec-head" style="background:${tintOf(r.genre)}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <a class="back" href="#/${list==='w'?'wishlist':'collection'}">${ICON.back}${list==='w'?'Wishlist':'Collection'}</a>
+        <button class="icon-btn" aria-label="More actions" data-act="recmore">${ICON.more}</button>
+      </div>
+      <div class="rec-cover">${coverHTML(r,val?{sticker:{text:money(val)},big:true}:{})}</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <h1 class="rec-title">${esc(r.title)}</h1>
+        <p class="rec-artist">${esc(r.artist)}</p>
+        <p class="rec-meta">${r.genre?`<span class="label-dot" aria-hidden="true"></span>${esc(r.genre)}`:''}${r.year?`<span class="mono">${r.genre?'· ':''}${esc(yearCache[k]||r.year)}</span>`:''}${list==='w'?`<span>· ${esc(TIER_LABEL[r.tier]||r.tier)}</span>`:''}</p>
+      </div>
+    </header>
+    <div class="cells" style="grid-template-columns:repeat(${list==='w'?3:2},minmax(0,1fr))">
+      ${list==='w'?`<div class="cell"><span class="cell-label">You plan</span><span class="cell-val">${money(r.price)}</span></div>`:''}
+      <div class="cell"><span class="cell-label">Discogs range</span><span class="cell-val">${ps?money(ps.low)+'–'+Math.round(ps.high):navigator.onLine?'…':'—'}</span></div>
+      <div class="cell"><span class="cell-label">${rating?(rating.source==='Pitchfork'?'Pitchfork':'MusicBrainz')+(rating.bnm||rating.bne?' · Best New Music':''):'Rating'}</span><span class="cell-val">${rating?esc((+rating.rating).toFixed(1)):'—'}</span></div>
+    </div>
+    <div style="padding:16px 20px;display:flex;gap:10px">
+      <a class="btn btn-primary" style="flex:1" target="_blank" rel="noopener" href="${esc(spotifyUrl(r))}">${ICON.play}Play on Spotify</a>
+      ${list==='w'?`<button class="btn" data-act="bought" data-k="${esc(k)}">Bought it</button>`:''}
+    </div>
+    <section class="tracks" aria-label="Tracklist">${tracksHTML(tracks)}</section>
+  </section>`;
+  if(keepScroll) $('#screen').scrollTop=prev; else $('#screen .back').focus({preventScroll:true});
+  wireCovers($('#overlay'));
+}
+function tracksHTML(t){
+  if(t==null) return `<p class="muted-note">Loading tracklist…</p>`;
+  if(typeof t==='string') return `<p class="muted-note">${esc(t)}</p>`;
+  const sides={},order=[];
+  t.forEach(x=>{const s=/^[A-Za-z]/.test(x.position||'')?x.position[0].toUpperCase():'Tracks';if(!sides[s]){sides[s]=[];order.push(s);}sides[s].push(x);});
+  return order.map(s=>`<h2 class="side-head">${s==='Tracks'?'Tracks':'Side '+esc(s)}</h2>${sides[s].map(x=>`<div class="track"><span class="pos">${esc(x.position)}</span><span class="nm">${esc(x.title)}</span><span class="dur">${esc(x.duration)}</span></div>`).join('')}`).join('');
+}
+async function loadTracks(r){
+  const k=keyOf(r.artist,r.title);
+  const set=v=>{if(recCtx&&recCtx.r===r){recCtx.tracks=v;renderRecord(true);}};
+  if(r.tracklist){try{return set(JSON.parse(r.tracklist));}catch{}}
+  if(trackCache[k]) return set(trackCache[k]);
+  if(!r.releaseId) return set("No tracklist: this record isn't linked to a Discogs release.");
+  try{
+    const res=await fetch(`/api/search?tracklist=true&releaseId=${encodeURIComponent(r.releaseId)}`,{signal:AbortSignal.timeout(10000)});
+    if(!res.ok) throw 0;
+    const d=await res.json();
+    if(!d.tracklist||!d.tracklist.length) return set('No tracklist found for this release.');
+    trackCache[k]=d.tracklist;saveCaches();set(d.tracklist);
+    if(COLL.includes(r)){r.tracklist=JSON.stringify(d.tracklist);save({action:'updateTracklist',artist:r.artist,title:r.title,tracklist:r.tracklist});}
+  }catch{set(navigator.onLine?"Couldn't load the tracklist. Try again in a moment.":"Tracklist isn't saved on this phone yet. It'll load when you're online.");}
+}
+function closeScreen(silent){
+  stopCamera();
+  $('#overlay').innerHTML='';recCtx=null;
+  if(!silent) render();
+}
+
+// ── Remove (behind the More menu), with undo ─────────────────
+function openRecMore(){
+  const {r,list}=recCtx;
+  openSheet(`<p class="sheet-title">${esc(r.title)}</p>
+    <button class="btn danger" data-act="remove">Remove from ${list==='w'?'wishlist':'collection'}</button>
+    <a class="btn" target="_blank" rel="noopener" href="https://www.discogs.com/search/?q=${encodeURIComponent(r.artist+' '+r.title)}&type=release">Find on Discogs</a>
+    <button class="btn" data-act="closesheet">Cancel</button>`,'More actions');
+}
+function removeCurrent(){
+  const {r,list}=recCtx;
+  closeSheet();
+  if(list==='c'){COLL=COLL.filter(x=>x!==r);save({action:'removeFromCollection',artist:r.artist,title:r.title});}
+  else{WISH=WISH.filter(x=>x!==r);save({action:'removeFromWishlist',artist:r.artist,title:r.title});}
+  persistLocal();
+  undoAction=()=>{if(list==='c'){COLL.push(r);save({action:'addToCollection',record:r});}else{WISH.push(r);save({action:'addToWishlist',record:r});}persistLocal();};
+  showNotice(`Removed “${r.title}”`,list==='c'?'From your collection':'From your wishlist',true);
+  location.hash=list==='w'?'#/wishlist':'#/collection';
+}
+let undoAction=null;
+
+// ── Bought it (from wishlist or price check) ────────────────
+async function boughtFromWish(w){
+  let worth=0;
+  try{if(navigator.onLine){const s=priceStats(await discogsSearch({artist:w.artist,title:w.title}));if(s)worth=s.median;}}catch{}
+  bought({...w,worth,paid:w.price,fromWish:w});
+}
+function bought({artist,title,year,genre,releaseId,image,worth,paid,fromWish}){
+  const rec=normC({artist,title,year,value:worth||paid||0,genre:genre||'',releaseId,image});
+  COLL.push(rec);
+  const wishRec=fromWish||WISH.find(w=>same(w,artist,title));
+  if(wishRec){WISH=WISH.filter(w=>w!==wishRec);save({action:'removeFromWishlist',artist:wishRec.artist,title:wishRec.title});}
+  save({action:'addToCollection',record:rec});
+  persistLocal();noteAdded(rec);
+  ui.newKey=keyOf(rec.artist,rec.title);
+  undoAction=()=>{COLL=COLL.filter(x=>x!==rec);if(wishRec){WISH.push(wishRec);}save({action:'undoCollection',artist:rec.artist,title:rec.title,backToWishlist:wishRec||null});persistLocal();ui.newKey=null;};
+  const sub=[title,paid?'paid '+money(paid):'',worth?'worth '+money(worth):''].filter(Boolean).join(' · ');
+  showNotice('Added to your collection',sub,true);
+  if(location.hash==='#/collection'){closeScreen(true);render();}else location.hash='#/collection';
+  setTimeout(()=>{const el=$('#new-tile');if(el)el.scrollIntoView({block:'center',behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});},150);
+  setTimeout(()=>{if(ui.newKey===keyOf(rec.artist,rec.title)){ui.newKey=null;if(ui.view==='collection'&&!$('#overlay').innerHTML)render();}},12000);
+}
+
+// ── Price check ──────────────────────────────────────────────
+const chk={artist:'',title:'',catno:'',barcode:'',price:'',state:'idle',results:[],pick:0,stats:null,err:'',verdict:''};
+function openCheck(prefill){
+  if(prefill){Object.assign(chk,{artist:'',title:'',catno:'',barcode:'',price:'',state:'idle',results:[]},prefill);}
+  renderCheck();
+  if(chk.state==='idle') $('#c-artist')?.focus();
+}
+function parsePrice(s){const n=parseFloat(String(s).replace(/[£,\s]/g,''));return isFinite(n)&&n>0?n:0;}
+function ownership(a,t){
+  const c=COLL.find(r=>same(r,a,t));if(c) return {kind:'owned',r:c};
+  const w=WISH.find(r=>same(r,a,t));if(w) return {kind:'wish',r:w};
+  return {kind:'none'};
+}
+function renderCheck(){
+  const c=chk, top=c.results[c.pick];
+  const seen=parsePrice(c.price);
+  const head=`<header class="band" style="padding-bottom:14px;gap:12px">
+    <div class="band-row"><h1 class="h1">Should I buy it?</h1><a class="icon-btn" href="#/collection" aria-label="Close">${ICON.close}</a></div>
+    <form class="check-form" id="check-form" novalidate>
+      <label class="field" style="grid-column:1/-1">Artist
+        <span class="with-btn"><input class="input" id="c-artist" value="${esc(c.artist)}" autocomplete="off" enterkeyhint="next"><a class="icon-btn" href="#/scan" aria-label="Scan the barcode">${ICON.scan}</a></span></label>
+      <label class="field">Album or catalogue no.<input class="input" id="c-title" value="${esc(c.title||c.catno)}" autocomplete="off" enterkeyhint="next"></label>
+      <label class="field">Sticker price<input class="input mono" id="c-price" value="${esc(c.price)}" inputmode="decimal" placeholder="£" autocomplete="off" enterkeyhint="go" ${c.state==='warn'?'aria-invalid="true" aria-describedby="pricewarn"':''}></label>
+      ${c.state==='warn'?`<div class="warn" id="pricewarn" role="alert" style="grid-column:1/-1"><p class="prose" style="flex:1;font-size:14px"><strong>${money(seen)} is far above anything Discogs has seen</strong> for this record. Did you mean ${money(c.suggest)}?</p><button type="button" class="btn" data-act="usesuggest">Use ${money(c.suggest)}</button></div>`:''}
+      <button class="btn btn-ink" style="grid-column:1/-1;min-height:48px" type="submit">${c.state==='checking'?'Checking…':'Check'}</button>
+      ${top&&c.state!=='checking'&&c.state!=='nomatch'?`<button type="button" class="match" style="grid-column:1/-1" data-act="changepick"><span class="thumb">${top.image?`<img src="${safeUrl(top.image)}" alt="">`:''}</span><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-weight:800">${esc(top.artist)} — ${esc(top.title)}</span><span class="mono" style="font-size:12px">${esc([top.year,top.label,top.country].filter(Boolean).join(' · '))}</span></span><span style="font-weight:800;text-decoration:underline;text-underline-offset:3px">${c.results.length>1?'Change':''}</span></button>`:''}
+    </form></header>`;
+  let body='', actions='';
+  const offlineNote=!navigator.onLine?`<div class="notice" role="status">${ICON.offline}<div class="notice-body"><span class="notice-title">You're offline</span><span class="notice-sub">${c.cachedAt?'Using prices saved on this phone on '+esc(new Date(c.cachedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'})):'Ownership still checks against this phone’s copy'}</span></div></div>`:'';
+  if(c.state==='idle'){
+    body=`${offlineNote}<p class="muted-note">Type the artist and album, or scan the barcode, then add the price on the sticker. You'll see whether you own it, what it goes for on Discogs, and whether this is a good price.</p>`;
+  } else if(c.state==='checking'){
+    body=`<div class="strip" role="status" aria-live="polite"><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-dasharray="4 3"><circle cx="12" cy="12" r="9"/></svg><span class="strip-title">Checking your collection…</span></div>
+      <div class="verdict dashed" aria-busy="true"><div class="verdict-head">Getting Discogs prices…</div><div class="verdict-body" aria-hidden="true"><span class="skel" style="height:40px;width:200px"></span><span class="skel" style="height:4px;margin-top:14px"></span><span class="skel" style="height:12px;width:80%"></span></div></div>
+      <p class="muted-note">Usually takes a couple of seconds. Your buttons appear once there's a verdict.</p>`;
+  } else if(c.state==='nomatch'||c.state==='error'){
+    body=`${offlineNote}<section class="error-card" role="alert"><p class="error-title">${c.state==='error'?'Couldn’t reach Discogs':'No Discogs match'}</p><p class="prose">${c.state==='error'?'Check your signal and try again. Ownership was still checked below.':`Nothing found for “${esc([c.artist,c.title].filter(Boolean).join(' '))}”. Check the spelling, or search by the catalogue number printed on the label or spine.`}</p></section>
+      <div style="margin-top:24px">${stripHTML()}</div>`;
+    actions=`<div class="row-btns"><a class="btn btn-primary" href="#/scan">${ICON.scan}Scan barcode</a><button class="btn" data-act="leave">Leave it</button></div>
+      ${c.state==='nomatch'?`<button class="btn-text" data-act="addnoprice">Add it without a price</button>`:''}`;
+  } else if(c.state==='result'||c.state==='warn'){
+    const o=ownership(top?top.artist:c.artist,top?top.title:c.title);
+    const s=c.stats;
+    let word='No price data',pct=null,line='';
+    if(s&&seen){
+      pct=Math.round((seen-s.median)/s.median*100);
+      word=pct<=-20?'Great deal':pct<=5?'Good price':pct<=25?'Fair':'Overpriced';
+      const d=Math.round(Math.abs(seen-s.median));
+      line=pct<=5?`${money(d)} under the median.`:`${money(d)} over the median.`;
+      if(d===0) line='Right on the median.';
+    } else if(s) {word='Median '+money(s.median);line='Add the sticker price for a verdict.';}
+    else line=c.results.length?`${c.results.length} pressing${c.results.length>1?'s':''} found, none with price data.`:'';
+    const fit=top?.genre?COLL.filter(r=>r.genre===top.genre).length:0;
+    if(fit) line+=` Sits next to ${fit} ${esc(top.genre)} record${fit>1?'s':''} you own.`;
+    const pos=v=>s&&s.high>s.low?Math.max(0,Math.min(100,(v-s.low)/(s.high-s.low)*100)):50;
+    const rail=s?`<div role="img" aria-label="${seen?'Sticker price '+money(seen)+' against':'Discogs'} range from ${money(s.low)} to ${money(s.high)}, median ${money(s.median)}">
+        <div class="rail"><div class="rail-line"></div><div class="rail-tick" style="left:${pos(s.median)}%"></div>${seen?`<span class="rail-you" style="left:${pos(seen)}%">${money(seen)}</span><div class="rail-dot" style="left:${pos(seen)}%"></div>`:''}</div>
+        <div class="rail-legend"><span>Low ${money(s.low)}</span><b>Median ${money(s.median)}</b><span>High ${money(s.high)}</span></div></div>`:'';
+    body=`${offlineNote}${stripHTML(o)}
+      ${c.state==='warn'?`<p class="muted-note">The verdict will show once the price looks right. Nothing has been saved.</p>`:`<section class="verdict" aria-label="Valuation">
+        <div class="verdict-head">${s?`${s.count} pressing${s.count>1?'s':''} with Discogs prices`:'Discogs'}${c.cachedAt?' · saved '+esc(new Date(c.cachedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'})):''}</div>
+        <div class="verdict-body"><p class="verdict-word">${esc(word)}</p>${rail}<p class="prose">${line}</p>${c.verdict?`<p class="prose" style="color:var(--muted)">${esc(c.verdict)}</p>`:''}</div>
+        ${pct!=null?`<span class="sticker lg" style="--rot:10deg">${pct>0?'+':'−'}${Math.abs(pct)}%</span>`:''}
+      </section>`}
+      ${o.kind==='owned'&&c.state!=='warn'?`<p class="prose" style="padding:22px 20px 0">${seen?esc(word)+', but you':'You'}’d have two. Buying it anyway adds it as a second copy.</p>`:''}`;
+    if(c.state==='result'){
+      actions=o.kind==='owned'
+        ?`<div class="row-btns"><button class="btn btn-primary" data-act="leave">Leave it</button><button class="btn" data-act="buy">Buy a 2nd copy</button></div>`
+        :`<div class="row-btns"><button class="btn btn-primary" data-act="buy">Bought it</button>${o.kind==='wish'?'':'<button class="btn" data-act="towish">Add to wishlist</button>'}</div><button class="btn-text" data-act="leave">Leave it</button>`;
+      if(!navigator.onLine) actions+=`<p style="font-size:13px;color:var(--muted)">Either saves on this phone now and goes to your Google Sheet when you're back online.</p>`;
+    }
+  }
+  $('#overlay').innerHTML=`<section class="screen" id="screen" role="dialog" aria-modal="true" aria-label="Should I buy it?"><div class="screen-body">${head}${body}</div>${actions?`<div class="screen-actions">${actions}</div>`:''}</section>`;
+  $('#check-form').addEventListener('submit',e=>{e.preventDefault();readCheckForm();runCheck();});
+}
+function stripHTML(o){
+  if(!o) o=ownership(chk.artist,chk.title);
+  if(o.kind==='owned') return `<div class="strip owned" role="status">${ICON.owned}<span style="display:flex;flex-direction:column;gap:2px"><span class="strip-title">You already own this</span><span class="strip-sub">${esc(o.r.title)} · worth ${money(o.r.value)}</span></span><a class="btn-text" style="margin-left:auto" href="#/record/${encodeURIComponent('c:'+keyOf(o.r.artist,o.r.title))}">View</a></div>`;
+  if(o.kind==='wish') return `<div class="strip" role="status">${ICON.wish}<span style="display:flex;flex-direction:column;gap:2px"><span class="strip-title">On your wishlist</span><span class="strip-sub">${esc(TIER_LABEL[o.r.tier]||'')} · you planned ${money(o.r.price)}</span></span></div>`;
+  return `<div class="strip" role="status">${ICON.notOwned}<span style="display:flex;flex-direction:column;gap:2px"><span class="strip-title">Not in your collection</span><span class="strip-sub">Or your wishlist · checked against ${COLL.length} records</span></span></div>`;
+}
+function readCheckForm(){
+  const v=id=>($(id)?.value||'').trim();
+  chk.artist=v('#c-artist');const t=v('#c-title');
+  // A catalogue number looks like letters+digits with no spaces between words, e.g. "TS 310" or "7243 8 48499".
+  if(/\d/.test(t)&&/^[A-Z0-9][A-Z0-9 .\-\/]{2,}$/i.test(t)&&!/[a-z]{4,}/.test(t)){chk.catno=t;chk.title='';}else{chk.title=t;chk.catno='';}
+  chk.price=v('#c-price');
+}
+async function runCheck(){
+  const c=chk;
+  if(!c.artist&&!c.title&&!c.catno&&!c.barcode){$('#c-artist')?.focus();return;}
+  c.state='checking';c.verdict='';c.cachedAt=null;renderCheck();
+  const params={};if(c.artist)params.artist=c.artist;if(c.title)params.title=c.title;if(c.catno)params.catalog=c.catno;if(c.barcode)params.barcode=c.barcode;
+  const ck='s:'+JSON.stringify(params).toLowerCase();
+  try{
+    if(!navigator.onLine) throw new Error('offline');
+    c.results=await discogsSearch(params);c.pick=0;
+    priceCache[ck]={at:Date.now(),results:c.results.slice(0,12)};saveCaches();
+  }catch(e){
+    const hit=priceCache[ck];
+    if(hit&&hit.results){c.results=hit.results;c.pick=0;c.cachedAt=hit.at;}
+    else{c.results=[];c.state=navigator.onLine?'error':'nomatch';if(!navigator.onLine)c.state='error';renderCheck();return;}
+  }
+  if(!c.results.length){c.state='nomatch';renderCheck();return;}
+  const top=c.results[0];
+  if(!c.artist) c.artist=top.artist; if(!c.title&&!c.catno) c.title=top.title;
+  c.stats=priceStats(c.results);
+  const seen=parsePrice(c.price);
+  // Implausible price: far outside anything Discogs has seen. Suggest the decimal it probably meant.
+  if(seen&&c.stats&&seen>Math.max(c.stats.high*4,100)){
+    let s=seen;while(s>c.stats.high*2&&s>=10)s=s/10;
+    c.suggest=Math.round(s*100)/100;c.state='warn';renderCheck();return;
+  }
+  c.state='result';renderCheck();
+  if(navigator.onLine&&top){
+    try{
+      const r=await fetch('/api/recommend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'price_check',record:{artist:top.artist,title:top.title,genre:top.genre||null},seenPrice:seen||null,avgPrice:c.stats?.median||null,collection:COLL,wishlist:WISH})});
+      if(r.ok){const d=await r.json();if(d.verdict&&chk.state==='result'){chk.verdict=d.verdict;renderCheck();}}
+    }catch{}
+  }
+}
+function pickRelease(){
+  openSheet(`<p class="sheet-title">Which pressing?</p>
+    ${chk.results.slice(0,12).map((r,i)=>`<button class="match" data-act="pick" data-i="${i}"><span class="thumb">${r.image?`<img src="${safeUrl(r.image)}" alt="">`:''}</span><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-weight:800">${esc(r.artist)} — ${esc(r.title)}</span><span class="mono" style="font-size:12px">${esc([r.year,r.label,r.catno,r.country].filter(Boolean).join(' · '))}</span></span><span class="mono" style="font-weight:700">${r.price?money(r.price):''}</span></button>`).join('')}
+    <button class="btn" data-act="closesheet">Cancel</button>`,'Which pressing?');
+}
+function checkBuy(){
+  const top=chk.results[chk.pick]||{}, seen=parsePrice(chk.price);
+  bought({artist:top.artist||chk.artist,title:top.title||chk.title,year:top.year,genre:top.genre,releaseId:top.releaseId,image:top.image,worth:chk.stats?.median||0,paid:seen});
+  resetCheck();
+}
+function resetCheck(){Object.assign(chk,{artist:'',title:'',catno:'',barcode:'',price:'',state:'idle',results:[],pick:0,stats:null,verdict:''});}
+function wishSheet(){
+  const top=chk.results[chk.pick]||{}, seen=parsePrice(chk.price);
+  openSheet(`<p class="sheet-title">Add to wishlist</p><p class="prose">${esc(top.artist||chk.artist)} — ${esc(top.title||chk.title)}</p>
+    <p class="sheet-sub">How will you buy it?</p>
+    <div class="chips" role="radiogroup" aria-label="Buying plan">${TIERS.map(([t,l],i)=>`<button class="chip" role="radio" aria-checked="${i===1}" data-act="tier" data-v="${t}">${l}</button>`).join('')}</div>
+    <label class="field">Target price<input class="input mono" id="w-price" inputmode="decimal" value="${esc(seen?seen:(chk.stats?.median||''))}"></label>
+    <button class="btn btn-primary" data-act="wishconfirm">Add to wishlist</button><button class="btn" data-act="closesheet">Cancel</button>`,'Add to wishlist');
+}
+function wishConfirm(){
+  const top=chk.results[chk.pick]||{};
+  const tier=$('#dialogs [data-act="tier"][aria-checked="true"]')?.dataset.v||'store';
+  const rec=normW({artist:top.artist||chk.artist,title:top.title||chk.title,year:top.year,price:parsePrice($('#w-price').value)||chk.stats?.median||0,tier,spotify:false,genre:top.genre||'',hmvNote:tier==='hmv'?'deal':(top.hmvNote||'nothmv'),image:top.image,releaseId:top.releaseId});
+  WISH.push(rec);save({action:'addToWishlist',record:rec});persistLocal();
+  closeSheet();resetCheck();
+  showNotice('Added to your wishlist',rec.title+' · '+(TIER_LABEL[tier]||''),false);
+  location.hash='#/wishlist';
+}
+
+// ── Scan ─────────────────────────────────────────────────────
+let camStream=null,scanLoop=null;
+function stopCamera(){cancelAnimationFrame(scanLoop);scanLoop=null;if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}}
+async function openScan(){
+  const supported='BarcodeDetector' in window&&navigator.mediaDevices?.getUserMedia;
+  $('#overlay').innerHTML=`<section class="screen" id="screen" role="dialog" aria-modal="true" aria-label="Scan the sleeve" style="background:var(--ink)">
+    <header class="band"><div class="band-row"><h1 class="h1">Scan the sleeve</h1><a class="icon-btn" href="#/check" aria-label="Close">${ICON.close}</a></div></header>
+    <div class="viewfinder" role="img" aria-label="Camera viewfinder">${supported?'<video id="cam" playsinline muted></video>':''}<div class="frame" aria-hidden="true"><span class="a"></span><span class="b"></span><span class="c"></span><span class="d"></span><span class="line"></span></div>
+      <p class="scan-caption" id="scan-caption" role="status">${supported?'Line up the barcode on the back of the sleeve':'This browser can’t scan barcodes. Type it instead.'}</p></div>
+    <div style="background:var(--ground);border-top:var(--rule) solid var(--ink);padding:16px 20px calc(24px + var(--bottom));display:flex;flex-direction:column;gap:14px;min-height:40vh">
+      <div style="display:flex;gap:10px"><a class="btn" style="flex:1" href="#/check">Type it instead</a>${supported?`<button class="icon-btn" style="width:52px;height:52px" aria-label="Turn torch on" aria-pressed="false" data-act="torch">${ICON.torch}</button>`:''}</div>
+      <p class="prose" style="font-size:14px;color:var(--muted)">Barcodes are on most records from the 1980s onwards. For older pressings, type the catalogue number from the label or spine.</p>
+    </div></section>`;
+  if(!supported) return;
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+    const v=$('#cam');if(!v){stopCamera();return;}
+    v.srcObject=camStream;await v.play();
+    const det=new BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e']});
+    const tick=async()=>{
+      if(!camStream) return;
+      try{const codes=await det.detect(v);if(codes.length){const code=codes[0].rawValue;stopCamera();if(navigator.vibrate)navigator.vibrate(40);Object.assign(chk,{artist:'',title:'',catno:'',barcode:code,state:'idle',results:[]});location.hash='#/check';setTimeout(()=>{chk.barcode=code;runCheck();},50);return;}}catch{}
+      scanLoop=requestAnimationFrame(tick);
+    };
+    tick();
+  }catch{
+    stopCamera();$('[data-act="torch"]')?.remove();const cap=$('#scan-caption');if(cap)cap.textContent='Camera access is off. Allow it in your browser settings, or type it instead.';
+  }
+}
+async function toggleTorch(btn){
+  const track=camStream?.getVideoTracks()[0];if(!track) return;
+  const on=btn.getAttribute('aria-pressed')!=='true';
+  try{await track.applyConstraints({advanced:[{torch:on}]});btn.setAttribute('aria-pressed',on);btn.setAttribute('aria-label',on?'Turn torch off':'Turn torch on');}
+  catch{const cap=$('#scan-caption');if(cap)cap.textContent='This phone’s torch can’t be controlled from the browser.';}
+}
+
+// ── Play: suggestions ────────────────────────────────────────
+const REC_KEY='vinyl_rec_v1', SKIP_KEY='vinyl_skipped_v1';
+const today=()=>new Date().toISOString().slice(0,10);
+async function loadRec(force){
+  const st=store.get(REC_KEY,{});
+  if(!force&&st.rec&&st.date===today()){ui.rec=st.rec;render();return;}
+  ui.recLoading=true;ui.rec=null;render();
+  try{
+    const res=await fetch('/api/recommend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({collection:COLL,wishlist:WISH,skipped:store.get(SKIP_KEY,[])})});
+    if(!res.ok) throw 0;
+    const rec=await res.json();
+    if(!rec.artist||!rec.title) throw 0;
+    await Promise.allSettled([
+      fetchArt(rec.artist,rec.title).then(u=>{if(u)rec.image=u;}),
+      discogsSearch({artist:rec.artist,title:rec.title}).then(r=>{const s=priceStats(r);if(s)rec.price=s.median;})
+    ]);
+    store.set(REC_KEY,{rec,date:today()});
+    ui.rec=rec;
+  }catch{ui.rec={error:true};}
+  ui.recLoading=false;
+  if(ui.view==='play') render();
+}
+function recSkip(){
+  const st=store.get(REC_KEY,{});
+  if(st.rec){const s=store.get(SKIP_KEY,[]);s.push({artist:st.rec.artist,title:st.rec.title});store.set(SKIP_KEY,s.slice(-30));}
+  store.set(REC_KEY,{date:''});loadRec(true);
+}
+function recAdd(){
+  const r=ui.rec;
+  if(COLL.some(x=>same(x,r.artist,r.title))||WISH.some(x=>same(x,r.artist,r.title))){showNotice('Already on your shelf or wishlist',r.title,false);render();return;}
+  const rec=normW({artist:r.artist,title:r.title,year:r.year,price:r.price||15,tier:'store',spotify:false,genre:r.genre||'',hmvNote:'nothmv',image:r.image||''});
+  WISH.push(rec);save({action:'addToWishlist',record:rec});persistLocal();
+  store.set(REC_KEY,{date:today()+'_added'});ui.rec=null;
+  showNotice('Added to your wishlist',rec.title,false);location.hash='#/wishlist';
+}
+
+// ── Sheets (dialogs) ─────────────────────────────────────────
+let sheetReturn=null;
+function openSheet(inner,label){
+  sheetReturn=document.activeElement;
+  $('#dialogs').innerHTML=`<div class="scrim" data-act="closesheet"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(label)}" tabindex="-1">${inner}</div>`;
+  const s=$('#dialogs .sheet');(s.querySelector('button,a,input')||s).focus();
+}
+function closeSheet(){$('#dialogs').innerHTML='';if(sheetReturn&&document.contains(sheetReturn))sheetReturn.focus();sheetReturn=null;}
+function sortSheet(){
+  openSheet(`<p class="sheet-title">Sort and filter</p>
+    <p class="sheet-sub">Sort by</p><div class="chips">${Object.entries(SORT_LABEL).map(([k,l])=>`<button class="chip" aria-pressed="${ui.csort===k}" data-act="setsort" data-v="${k}">${l}</button>`).join('')}</div>
+    <p class="sheet-sub">Genres</p><div class="chips">${GENRES.map(g=>`<button class="chip" aria-pressed="${ui.genres.has(g)}" data-act="genre" data-v="${esc(g)}">${esc(g.replace(' / Leftfield','').replace(' / New Wave',''))}</button>`).join('')}</div>
+    <div style="display:flex;gap:10px"><button class="btn btn-primary" style="flex:1" data-act="closesheet">Done</button><button class="btn" data-act="cleargenres">Clear</button></div>`,'Sort and filter');
+}
+
+// ── CSV import ───────────────────────────────────────────────
+const GENRE_LOOKUP={'367750':['Rock / New Wave',12],'576350':['Soul / Funk',6],'13275941':['Hip-Hop',18],'1244904':['Soul / Funk',6],'851063':['Soul / Funk',8],'13374531':['R&B / Pop',8],'427699':['R&B / Pop',8],'1813591':['Soul / Funk',6],'26548631':['Soul / Funk',5],'1118411':['Soul / Funk',6],'1625224':['Disco / Pop',8],'2185376':['Soul / Funk',10],'422374':['Soul / Funk',8],'2400372':['Soul / Funk',8],'24809981':['Hip-Hop',15],'3709972':['R&B / Pop',8],'1616334':['Motown',8],'2058315':['Motown',6],'33894813':['Disco / Pop',12],'609817':['Motown',10],'105119':['Soul / Funk',8],'1421899':['Soul / Funk',10],'663542':['Soul / Funk',10],'3215835':['Soul / Funk',10],'205846':['Soul / Funk',12],'4036144':['Rock / New Wave',12],'984457':['Soul / Funk',15],'12647237':['Hip-Hop',20],'13451492':['Reggae',15],'34684668':['Hip-Hop',20],'5598404':['Hip-Hop',20],'14210644':['Hip-Hop',22],'7085324':['Soul / Funk',12],'19206955':['Neo-Soul / Leftfield',18],'2780047':['Reggae',8],'257240':['R&B / Pop',6],'266342':['Soul / Funk',15],'7747375':['R&B / Pop',18],'416178':['Soul / Funk',20],'8897144':['Neo-Soul / Leftfield',15],'31019308':['Neo-Soul / Leftfield',25],'19792855':['Neo-Soul / Leftfield',18],'12105956':['Neo-Soul / Leftfield',18],'8485558':['Rock / New Wave',12],'1162602':['Hip-Hop',15],'3905158':['Soul / Funk',10],'715004':['Soul / Funk',8],'26344301':['Hip-Hop',25],'14067643':['Reggae',12],'1080690':['Reggae',15],'8880179':['Reggae',15],'14189378':['Neo-Soul / Leftfield',15],'601218':['Rock / New Wave',12],'532044':['Jazz',8],'2194729':['Rock / New Wave',10],'64061':['Electronic',12],'25837318':['Hip-Hop',18],'136005':['Electronic',10],'3732908':['Electronic',10],'3893826':['Rock / New Wave',5],'778762':['Rock / New Wave',10],'453259':['Rock / New Wave',12],'591099':['Electronic',8],'11372324':['Motown',12],'13119958':['R&B / Pop',8],'3660502':['Motown',8],'9157716':['R&B / Pop',8],'800723':['Soul / Funk',10],'516710':['Soul / Funk',10],'787217':['Motown',10],'17173231':['R&B / Pop',8],'32301513':['Motown',8],'14032984':['Rock / New Wave',12],'391161':['Rock / New Wave',15],'5454806':['Soul / Funk',8],'23672957':['Rock / New Wave',8],'13015306':['Rock / New Wave',8],'470914':['Rock / New Wave',15],'18888631':['Neo-Soul / Leftfield',18],'9484576':['Neo-Soul / Leftfield',20],'302584':['Soul / Funk',10],'9425519':['Soul / Funk',20],'472226':['Hip-Hop',10],'33118863':['Motown',20],'491817':['Motown',15],'2102311':['Motown',35],'491835':['Motown',15],'1512686':['Motown',12],'590450':['Motown',10],'795778':['Motown',8],'12623664':['Motown',10],'376310':['R&B / Pop',8],'35152429':['Neo-Soul / Leftfield',15],'11267916':['Neo-Soul / Leftfield',20],'14722559':['Hip-Hop',28],'1828009':['Soul / Funk',12],'1821484':['Rock / New Wave',8],'32078100':['Neo-Soul / Leftfield',18],'455024':['Rock / New Wave',10],'1328502':['Jazz',8],'31960217':['Soul / Funk',15],'156550':['Soul / Funk',10],'10244337':['Soul / Funk',8],'457747':['Soul / Funk',8],'9820590':['Hip-Hop',12],'19525324':['Neo-Soul / Leftfield',20],'28445662':['Neo-Soul / Leftfield',20],'26842724':['Jazz',25],'620216':['Rock / New Wave',12],'25825285':['R&B / Pop',18],'4448532':['Rock / New Wave',15],'496781':['Soul / Funk',11],'1531801':['Soul / Funk',20],'371058':['Soul / Funk',11],'458038':['Soul / Funk',10],'375628':['Rock / New Wave',20],'4205215':['R&B / Pop',8],'4843972':['Soul / Funk',8],'12582251':['Rock / New Wave',20],'1094195':['Soul / Funk',10],'1108104':['Soul / Funk',10],'802972':['Soul / Funk',15],'1140804':['Soul / Funk',8],'1475670':['Soul / Funk',10],'556049':['Motown',12],'12678959':['Hip-Hop',40],'3536720':['Motown',8],'11557309':['Soul / Funk',20]};
+function parseCSV(text){
+  const lines=text.split(/\r?\n/);
+  const headers=lines[0].split(',').map(h=>h.replace(/"/g,'').trim());
+  return lines.slice(1).filter(l=>l.trim()).map(line=>{
+    const vals=[];let cur='',inQ=false;
+    for(const ch of line){if(ch==='"')inQ=!inQ;else if(ch===','&&!inQ){vals.push(cur.trim());cur='';}else cur+=ch;}
+    vals.push(cur.trim());
+    const o={};headers.forEach((h,i)=>{o[h]=(vals[i]||'').replace(/^"|"$/g,'');});return o;
+  });
+}
+let importPlan=null;
+async function handleCSV(file){
+  const rows=parseCSV(await file.text());
+  openSheet(`<p class="sheet-title">Import from Discogs</p><p class="prose" role="status">Checking genres for ${rows.length} records…</p>`,'Import from Discogs');
+  const csv={},unknown=[];
+  rows.forEach(r=>{
+    const rid=r['release_id']?.trim();if(!rid) return;
+    const artist=(r['Artist']||'').replace(/ \(\d+\)$/,'').trim(), title=(r['Title']||'').trim(), year=(r['Released']||'').trim();
+    if(GENRE_LOOKUP[rid]){const [genre,value]=GENRE_LOOKUP[rid];csv[rid]={artist,title,year,value,genre,releaseId:rid,image:''};}
+    else unknown.push({rid,artist,title,year});
+  });
+  for(let i=0;i<unknown.length;i+=4){
+    await Promise.allSettled(unknown.slice(i,i+4).map(async({rid,artist,title,year})=>{
+      let genre=null,value=10;
+      try{const res=await discogsSearch({releaseId:rid});const top=res[0];if(top?.genre)genre=top.genre;if(top?.price)value=top.price;}catch{}
+      csv[rid]={artist,title,year,value,genre:genre||'Soul / Funk',releaseId:rid,image:''};
+    }));
+  }
+  const byRid={},byName={};
+  COLL.forEach(r=>{if(r.releaseId)byRid[r.releaseId]=r;byName[(r.artist+'|'+r.title).toLowerCase()]=r;});
+  const toAdd=[],toUpdate=[],toRemove=[],wishToRemove=[];
+  Object.entries(csv).forEach(([rid,c])=>{
+    const ex=byRid[rid]||byName[(c.artist+'|'+c.title).toLowerCase()];
+    if(!ex){if(!toAdd.some(r=>same(r,c.artist,c.title)))toAdd.push(c);}
+    else if(ex.artist!==c.artist||ex.title!==c.title||String(ex.year)!==String(c.year)||ex.genre!==c.genre) toUpdate.push({...ex,...c});
+    const w=WISH.find(w=>same(w,c.artist,c.title));if(w)wishToRemove.push(w);
+  });
+  Object.entries(byRid).forEach(([rid,r])=>{if(!csv[rid])toRemove.push(r);});
+  importPlan={toAdd,toUpdate,toRemove,wishToRemove};
+  const sec=(t,list)=>list.length?`<p class="sheet-sub">${t} · ${list.length}</p><ul class="rows" style="max-height:30vh;overflow:auto">${list.map(r=>`<li style="padding:8px 12px;border-bottom:var(--row-rule) solid var(--ink);font-size:14px">${esc(r.artist)} — ${esc(r.title)}</li>`).join('')}</ul>`:'';
+  const any=toAdd.length+toUpdate.length+toRemove.length+wishToRemove.length;
+  $('#dialogs .sheet').innerHTML=`<p class="sheet-title">Import from Discogs</p><p class="prose">${rows.length} records in the file. ${any?'Here’s what will change in your Google Sheet:':'Your sheet is already up to date.'}</p>
+    ${sec('Adding',toAdd)}${sec('Updating',toUpdate)}${sec('Removing',toRemove)}${sec('Off your wishlist',wishToRemove)}
+    ${any?`<button class="btn btn-primary" data-act="importconfirm">Save ${any} change${any>1?'s':''}</button><button class="btn" data-act="closesheet">Cancel</button>`:`<button class="btn" data-act="closesheet">Close</button>`}`;
+}
+async function confirmImport(btn){
+  const {toAdd,toUpdate,toRemove,wishToRemove}=importPlan;
+  btn.disabled=true;btn.textContent='Saving…';
+  try{
+    const payload={action:'bulkSync',toAdd,toUpdate,toRemove};if(wishToRemove.length)payload.wishToRemove=wishToRemove;
+    await postRaw(payload);
+    toRemove.forEach(r=>{COLL=COLL.filter(c=>c.releaseId!==r.releaseId);});
+    toUpdate.forEach(r=>{const i=COLL.findIndex(c=>c.releaseId===r.releaseId);if(i>=0)COLL[i]=normC(r);});
+    toAdd.forEach(r=>{if(!COLL.some(c=>(r.releaseId&&c.releaseId===r.releaseId)||same(c,r.artist,r.title)))COLL.push(normC(r));});
+    wishToRemove.forEach(w=>{WISH=WISH.filter(c=>!same(c,w.artist,w.title));});
+    persistLocal();snapshotValue();lastSync=Date.now();store.set('vinyl_last_sync',lastSync);
+    closeSheet();
+    showNotice('Imported from Discogs',[toAdd.length&&toAdd.length+' added',toUpdate.length&&toUpdate.length+' updated',toRemove.length&&toRemove.length+' removed'].filter(Boolean).join(' · '),false);
+    location.hash='#/collection';render();
+  }catch{btn.disabled=false;btn.textContent='Try saving again';announce('Not saved. Check your signal and try again.');}
+}
+
+// ── Events ───────────────────────────────────────────────────
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');if(!el) return;
+  const a=el.dataset.act, v=el.dataset.v;
+  const acts={
+    mode(){ui.mode=v;store.set('vinyl_view_mode',v);render();},
+    sortsheet:sortSheet,
+    setsort(){ui.csort=v;render();sortSheet();},
+    genre(){ui.genres.has(v)?ui.genres.delete(v):ui.genres.add(v);render();sortSheet();},
+    cleargenres(){ui.genres.clear();closeSheet();render();},
+    wfilter(){ui.wfilters.has(v)?ui.wfilters.delete(v):ui.wfilters.add(v);render();},
+    closesheet:closeSheet,
+    retry(){flush();},
+    reload(){ui.loaded=false;render();load();},
+    undo(){clearInterval(undoTimer);if(undoAction)undoAction();undoAction=null;ui.notice=null;announce('Undone');render();},
+    import(){$('#csv-input').click();},
+    importconfirm(){confirmImport(el);},
+    checkq(){e.preventDefault();openCheckFromSearch();},
+    bought(){const k=el.dataset.k;const w=WISH.find(r=>keyOf(r.artist,r.title)===k);if(w){el.disabled=true;boughtFromWish(w);}},
+    recmore:openRecMore, remove:removeCurrent,
+    playtab(){ui.playTab=v;render();},
+    spin(){const prev=ui.spin;if(COLL.length>1){do ui.spin=COLL[Math.floor(Math.random()*COLL.length)];while(ui.spin===prev);}ui.spun=true;render();ui.spun=false;},
+    recadd:recAdd, recskip:recSkip, recagain(){loadRec(true);},
+    usesuggest(){chk.price=String(chk.suggest);readCheckFormKeep();runCheck();},
+    changepick(){if(chk.results.length>1)pickRelease();},
+    pick(){chk.pick=+el.dataset.i;const r=chk.results[chk.pick];chk.artist=r.artist;chk.title=r.title;closeSheet();renderCheck();},
+    leave(){resetCheck();location.hash='#/collection';},
+    buy:checkBuy, towish:wishSheet, wishconfirm:wishConfirm,
+    tier(){$('#dialogs').querySelectorAll('[data-act="tier"]').forEach(b=>{b.setAttribute('aria-checked',b===el);});},
+    addnoprice(){chk.results=[{artist:chk.artist,title:chk.title||chk.catno,year:'',genre:'',releaseId:'',image:''}];chk.pick=0;chk.stats=null;chk.state='result';renderCheck();},
+    torch(){toggleTorch(el);},
+  };
+  if(acts[a]) acts[a]();
+});
+function readCheckFormKeep(){const p=chk.price;readCheckForm();chk.price=p;}
+function openCheckFromSearch(){
+  const q=ui.q.trim();
+  Object.assign(chk,{artist:q,title:'',catno:'',barcode:'',price:'',state:'idle',results:[]});
+  location.hash='#/check';
+}
+$('#search').addEventListener('input',e=>{ui.q=e.target.value;render();$('#search').focus();});
+$('#csv-input').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';if(f)handleCSV(f);});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape') return;
+  if($('#dialogs').innerHTML){closeSheet();return;}
+  if($('#overlay').innerHTML){location.hash=recCtx?.list==='w'?'#/wishlist':'#/'+ui.view;}
+});
+// Keep focus inside an open dialog.
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Tab') return;
+  const box=$('#dialogs .sheet')||$('#overlay .screen');if(!box) return;
+  const f=[...box.querySelectorAll('a[href],button:not([disabled]),input,select,[tabindex="0"]')];if(!f.length) return;
+  if(e.shiftKey&&document.activeElement===f[0]){e.preventDefault();f[f.length-1].focus();}
+  else if(!e.shiftKey&&document.activeElement===f[f.length-1]){e.preventDefault();f[0].focus();}
+});
+// Collapse the header band as the collection scrolls.
+let ticking=false;
+window.addEventListener('scroll',()=>{if(ticking)return;ticking=true;requestAnimationFrame(()=>{$('#band')?.classList.toggle('compact',window.scrollY>80);ticking=false;});},{passive:true});
+window.addEventListener('online',()=>{ui.offline=false;if(ui.source!=='sheet'){load();}else{flush();render();}});
+window.addEventListener('offline',()=>{ui.offline=true;render();});
+
+render();
+load().then(route);
+</script>
+</body>
+</html>
